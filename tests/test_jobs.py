@@ -134,3 +134,17 @@ def test_without_store_every_call_reviews():
     run_review_job(ReviewJob("o", "r", 1, head_sha="sha1"), _settings(), llm=llm, gh=gh)
     run_review_job(ReviewJob("o", "r", 1, head_sha="sha1"), _settings(), llm=llm, gh=gh)
     assert len(llm.calls) == 2
+
+
+def test_duplicate_is_skipped_before_any_github_call():
+    store = _store()
+    run_review_job(ReviewJob("o", "r", 1, head_sha="sha1"), _settings(), llm=_llm(), gh=FakeGitHub(MODIFIED), store=store)
+
+    # No GitHub client and no credentials: building one would raise, so this
+    # passes only if the duplicate is rejected before any GitHub call.
+    no_creds = Settings(
+        openai_api_key="test", openai_model="m", github_token=None, github_app_id=None,
+        github_private_key=None, webhook_secret="t", max_tokens_per_chunk=6000, max_chunks=5,
+        max_comments=10, db_path=":memory:",
+    )
+    assert run_review_job(ReviewJob("o", "r", 1, head_sha="sha1"), no_creds, store=store) is None

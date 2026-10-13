@@ -5,11 +5,19 @@ updated, nitpick reads the diff, asks an LLM to look for bugs, security
 issues, performance problems and readability issues, and posts the
 findings back to GitHub as inline review comments.
 
+
 ## Why
 
 Small teams and solo developers often merge code that nobody else has
 read. nitpick gives every PR a fast first pass so human reviewers can
 spend their time on design questions instead of obvious mistakes.
+
+## Status
+
+nitpick runs as a GitHub App and has been tested end to end on a sandbox
+repository, receiving webhooks through a smee.io tunnel: first review of
+a PR, a skipped duplicate delivery, and an incremental review after a new
+commit. Cloud deployment is planned next.
 
 ## How it works
 
@@ -43,6 +51,12 @@ flowchart LR
   runs as a background task.
 - **Verify every webhook.** Requests without a valid
   `X-Hub-Signature-256` are rejected before any LLM call is made.
+- **Inline comments only on changed lines.** Comments on unchanged
+  context lines are usually opinions about pre-existing code, so they
+  go into a collapsible "Notes on unchanged code" section of the summary
+  instead. They are kept rather than discarded because a real problem,
+  such as a caller left stale by a signature change, often sits on an
+  unchanged line.
 - **Never trust the LLM's line numbers.** Comments that point at lines
   outside the diff are dropped instead of being sent to GitHub, and the
   number of dropped comments is recorded.
@@ -69,6 +83,51 @@ flowchart LR
   single summary comment.
 - **Testable core.** Parsing, chunking and reviewing have no HTTP or SDK
   dependencies; tests use a fake LLM and a fake GitHub client.
+
+## Results
+
+Measured with the [evaluation harness](evaluation/README.md): 16 small
+PRs (11 with one planted bug, security or performance issue, 3 clean
+PRs that should get no comments, and 2 harder cases), each run 3 times
+with `gpt-4o-mini`.
+
+| Change | Recall | Strict precision | Inline false positives per clean PR | Large-file case | Cost per review |
+| --- | --- | --- | --- | --- | --- |
+| Baseline | 92% | 100% | 0.56 | 0/3 | $0.00018 |
+| Comments on unchanged lines become notes | 92% | 100% | 0.11 | 0/3 | $0.00018 |
+| Hunk-level chunking and review budget | 100% | 100% | 0.00 | 3/3 | $0.00023 |
+
+How to read this honestly:
+
+- **Chunking** is the clearest result. The baseline cut off large files,
+  so a bug in the last hunk was never sent to the LLM. Splitting by hunk
+  fixed that case (0/3 to 3/3) and changed the chunking of no other
+  case. The cost is about 28% more per review on average, because the
+  large file now takes two LLM calls.
+- **Notes** were evaluated together with a fix to one clean test case,
+  so the drop from 0.56 to 0.11 has two causes. The isolated effect is
+  on the rename-only PR: inline comments fell from 0.7 to 0.3 per run.
+- The drop from 0.11 to 0.00 in the last row is run-to-run variation,
+  not an effect of chunking: the clean cases were chunked identically.
+
+## Known limitations
+
+- **The benchmark is saturated.** Every planted issue is now found, so
+  this set can no longer show whether a prompt or model change helps.
+  Harder cases (longer PRs, subtler bugs, several issues per PR) are
+  needed, ideally collected from real reviews.
+- **Matching checks location, not content.** A comment on the right line
+  counts as a hit even if its suggested fix is wrong. In one run the
+  model correctly flagged a weak test but proposed an assertion that
+  would itself fail.
+- **Opinions about unchanged behaviour can still appear inline.** On a
+  rename-only PR the model sometimes comments on existing behaviour and
+  attaches the comment to a renamed line, which the changed-lines rule
+  cannot distinguish. Fixing this would need semantic checks; it was
+  left as is because it happens in about one run in three.
+- **Small sample.** 16 cases and 3 runs each; differences of a few
+  percent are not meaningful.
+- Tokens are estimated as characters / 4 rather than counted exactly.
 
 ## Quick start (CLI)
 

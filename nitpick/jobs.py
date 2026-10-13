@@ -72,15 +72,26 @@ def run_review_job(
     store: ReviewStore | None = None,
 ) -> ReviewResult | None:
     """Review one PR commit. Returns None if there was nothing to do."""
+    repo_key = f"{job.owner}/{job.repo}"
+
+    def claim() -> bool:
+        if store is None or store.try_claim(repo_key, job.number, job.head_sha):
+            return True
+        logger.info("Skipping %s#%d@%s: already reviewed or in progress", repo_key, job.number, job.head_sha[:7])
+        return False
+
+    # Webhooks include the head commit, so duplicates can be rejected before
+    # requesting an installation token (found while testing with real
+    # deliveries: skipped duplicates were still fetching a token).
+    if job.head_sha is not None and not claim():
+        return None
+
     gh = gh or GitHubClient(resolve_token(settings, job.installation_id))
 
     if job.head_sha is None:
         job.head_sha = gh.get_pull_request(job.owner, job.repo, job.number)["head"]["sha"]
-
-    repo_key = f"{job.owner}/{job.repo}"
-    if store is not None and not store.try_claim(repo_key, job.number, job.head_sha):
-        logger.info("Skipping %s#%d@%s: already reviewed or in progress", repo_key, job.number, job.head_sha[:7])
-        return None
+        if not claim():
+            return None
 
     try:
         result = _review(job, settings, llm, gh, store, repo_key)
