@@ -15,7 +15,10 @@ def format_comment(comment: ReviewComment) -> str:
 
 
 def format_summary(result: ReviewResult) -> str:
-    lines = ["## nitpick review", "", result.summary, ""]
+    lines = ["## nitpick review", ""]
+    if result.since_sha:
+        lines += [f"Reviewed changes since `{result.since_sha[:7]}`.", ""]
+    lines += [result.summary, ""]
     lines.append(f"Inline comments: {len(result.comments)}")
 
     if result.notes:

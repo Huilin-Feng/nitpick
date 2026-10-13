@@ -108,3 +108,5 @@ class ReviewResult:
     # that is not in the diff). Useful for measuring LLM reliability.
     dropped_comments: int = 0
     failed_chunks: int = 0
+    # Set for incremental reviews: only changes after this commit were reviewed.
+    since_sha: str | None = None

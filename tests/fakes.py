@@ -27,16 +27,23 @@ class FakeResponse:
 
 
 class FakeGitHub:
-    def __init__(self, diff, review_statuses=(200,)):
+    def __init__(self, diff, review_statuses=(200,), compare=None):
         self.diff = diff
         self.review_statuses = list(review_statuses)
         self.reviews = []
+        # {(base, head): diff text, "" for no changes, or None for force push}
+        self.compare = compare or {}
+        self.compare_calls = []
 
     def get_pull_request(self, owner, repo, number):
         return {"head": {"sha": "abc123"}}
 
     def get_pull_request_diff(self, owner, repo, number):
         return self.diff
+
+    def compare_diff(self, owner, repo, base, head):
+        self.compare_calls.append((base, head))
+        return self.compare.get((base, head))
 
     def create_review(self, owner, repo, number, commit_id, body, comments):
         self.reviews.append({"commit_id": commit_id, "body": body, "comments": comments})

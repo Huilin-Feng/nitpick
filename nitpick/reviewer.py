@@ -28,11 +28,22 @@ class Reviewer:
         self.max_comments = max_comments
         self.max_chunks = max_chunks
 
-    def review(self, diff_text: str) -> ReviewResult:
+    def review(self, diff_text: str, position_diff_text: str | None = None) -> ReviewResult:
+        """Review `diff_text`.
+
+        `position_diff_text` is used for incremental reviews: `diff_text`
+        holds only the new commits, but GitHub positions inline comments
+        against the whole PR diff. A line can be new in this push yet not
+        part of the PR diff (e.g. a change that was reverted back to the
+        base version); such comments become notes instead of being rejected.
+        """
         files = parse_diff(diff_text)
         chunks, skipped = build_chunks(files, self.max_tokens_per_chunk, self.max_chunks)
         commentable = {f.path: f.commentable_lines() for f in files}
         added = {f.path: f.added_lines() for f in files}
+        positionable = None
+        if position_diff_text is not None:
+            positionable = {f.path: f.commentable_lines() for f in parse_diff(position_diff_text)}
 
         summaries: list[str] = []
         comments: list[ReviewComment] = []
@@ -57,7 +68,9 @@ class Reviewer:
                 comment = _to_comment(raw)
                 if comment is None:
                     dropped += 1
-                elif comment.line in added.get(comment.path, set()):
+                elif comment.line in added.get(comment.path, set()) and (
+                    positionable is None or comment.line in positionable.get(comment.path, set())
+                ):
                     comments.append(comment)
                 elif comment.line in commentable.get(comment.path, set()):
                     # Unchanged context line: keep it, but out of the inline review.

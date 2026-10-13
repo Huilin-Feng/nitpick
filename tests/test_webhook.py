@@ -15,7 +15,7 @@ def _settings():
     return Settings(
         openai_api_key="test", openai_model="m", github_token="t",
         github_app_id=None, github_private_key=None, webhook_secret=SECRET,
-        max_tokens_per_chunk=6000, max_chunks=5, max_comments=10,
+        max_tokens_per_chunk=6000, max_chunks=5, max_comments=10, db_path=':memory:',
     )
 
 

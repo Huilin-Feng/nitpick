@@ -32,6 +32,7 @@ flowchart LR
 | `chunker.py` | Filter, prioritise and split files into LLM-sized chunks |
 | `reviewer.py` | Call the LLM per chunk, validate and rank comments |
 | `jobs.py` | Fetch the PR, run the review, post it (with fallback) |
+| `store.py` | SQLite record of reviewed commits (deduplication, incremental reviews) |
 | `main.py` | Webhook endpoint: signature check, event filtering |
 | `cli.py` | Review a PR from the terminal (dry run by default) |
 
@@ -53,6 +54,14 @@ flowchart LR
 - **Bounded cost.** A review makes at most `MAX_CHUNKS` LLM calls. When a
   PR is larger than that, source code is reviewed before tests, and tests
   before config and docs; anything left out is listed in the summary.
+- **Review each commit once.** GitHub can deliver the same webhook more
+  than once. A (repo, PR, head commit) row with a primary key is claimed
+  before any LLM call, so concurrent duplicates cannot both proceed.
+  Failed or stuck reviews (no update for 15 minutes) can be retried.
+- **Incremental reviews.** After new commits are pushed, only the changes
+  since the last reviewed commit are reviewed. After a force push or
+  rebase the old commit is no longer an ancestor, so the whole PR is
+  reviewed again.
 - **Pin the reviewed commit.** Reviews are posted against the head SHA
   that was actually reviewed.
 - **Degrade gracefully.** One failing LLM call does not stop the review,
@@ -92,6 +101,10 @@ read/write access to Pull requests and read access to Contents.
 uvicorn nitpick.main:app --port 8000
 ```
 
+Review history is stored in `NITPICK_DB_PATH` (default `nitpick.db`). In
+Docker it lives at `/data/nitpick.db`; mount a volume there so it
+survives restarts.
+
 For local testing, expose the port with a tunnel (for example smee.io
 or ngrok) and use that URL as the app's webhook URL.
 
@@ -110,7 +123,7 @@ planted bugs used to measure review quality.
 
 - [x] Smarter chunking for large PRs (hunk splitting, file priority, review budget)
 - [ ] Exact token counting with tiktoken
-- [ ] Skip work that was already done (idempotent deliveries, review only new changes)
+- [x] Skip work that was already done (idempotent deliveries, review only new changes)
 - [x] Evaluation harness with planted-issue cases
 - [ ] Evaluation on real pull requests
 - [ ] Per-repository configuration file

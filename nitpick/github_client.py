@@ -41,6 +41,28 @@ class GitHubClient:
         resp.raise_for_status()
         return resp.text
 
+    def compare_diff(self, owner: str, repo: str, base: str, head: str) -> str | None:
+        """Diff of what changed from `base` to `head`.
+
+        Returns "" if nothing changed, or None if `head` is not simply
+        `base` plus new commits (force push, rebase, or `base` no longer
+        exists). The caller should then fall back to a full review.
+        """
+        url = f"/repos/{owner}/{repo}/compare/{base}...{head}"
+        meta = self._http.get(url, headers={**self._headers, "Accept": "application/vnd.github+json"})
+        if meta.status_code == 404:
+            return None
+        meta.raise_for_status()
+        status = meta.json().get("status")
+        if status == "identical":
+            return ""
+        if status != "ahead":
+            return None
+
+        resp = self._http.get(url, headers={**self._headers, "Accept": "application/vnd.github.v3.diff"})
+        resp.raise_for_status()
+        return resp.text
+
     def create_review(
         self,
         owner: str,

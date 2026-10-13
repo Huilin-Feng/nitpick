@@ -30,6 +30,7 @@ def main(argv: list[str] | None = None) -> int:
     owner, repo, number = parse_pr_url(args.pr_url)
 
     if args.post:
+        # No ReviewStore here: running the CLI by hand always does a full review.
         result = run_review_job(ReviewJob(owner, repo, number), settings)
         print(f"Posted review with {len(result.comments)} inline comment(s).")
         return 0

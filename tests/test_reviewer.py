@@ -1,7 +1,7 @@
 from nitpick.models import Severity
 from nitpick.reviewer import Reviewer
 from tests.fakes import FakeLLM
-from tests.sample_diffs import MODIFIED, MULTI
+from tests.sample_diffs import INCREMENTAL_OUTSIDE_PR, MODIFIED, MULTI
 
 
 def _comment(path="app/utils.py", line=2, severity="bug", message="Problem"):
@@ -92,3 +92,12 @@ def test_prompt_contains_line_numbers():
     llm = FakeLLM([{"summary": "s", "comments": []}])
     Reviewer(llm).review(MODIFIED)
     assert '    2 + def load(path, mode="r"):' in llm.calls[0]
+
+
+def test_incremental_line_outside_pr_diff_becomes_note():
+    # Line 9 is new in this push, but GitHub cannot place an inline comment
+    # on it because it is not part of the PR diff (MODIFIED).
+    llm = FakeLLM([{"summary": "s", "comments": [_comment(line=9)]}])
+    result = Reviewer(llm).review(INCREMENTAL_OUTSIDE_PR, position_diff_text=MODIFIED)
+    assert result.comments == []
+    assert [n.line for n in result.notes] == [9]

@@ -15,6 +15,7 @@ from fastapi.responses import JSONResponse
 from nitpick import jobs
 from nitpick.config import Settings
 from nitpick.security import verify_signature
+from nitpick.store import ReviewStore
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 logger = logging.getLogger(__name__)
@@ -30,7 +31,7 @@ def get_settings() -> Settings:
 
 def run_job_safely(job: jobs.ReviewJob, settings: Settings) -> None:
     try:
-        jobs.run_review_job(job, settings)
+        jobs.run_review_job(job, settings, store=ReviewStore(settings.db_path))
     except Exception:
         logger.exception("Review failed for %s/%s#%d", job.owner, job.repo, job.number)
 

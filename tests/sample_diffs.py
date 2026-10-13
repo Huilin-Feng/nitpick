@@ -60,3 +60,25 @@ index 8888888..9999999 100644
 """
 
 MULTI = MODIFIED + ADDED + DELETED + RENAMED + BINARY
+
+# Diff of one new commit on top of MODIFIED: adds line 3 only.
+INCREMENTAL = """diff --git a/app/utils.py b/app/utils.py
+index 2222222..3333333 100644
+--- a/app/utils.py
++++ b/app/utils.py
+@@ -2,3 +2,4 @@
+ def load(path, mode="r"):
++    # read the whole file
+     return open(path).read()
+ 
+"""
+
+# A new commit that adds line 9, which is not part of the PR diff MODIFIED.
+INCREMENTAL_OUTSIDE_PR = """diff --git a/app/utils.py b/app/utils.py
+index 2222222..4444444 100644
+--- a/app/utils.py
++++ b/app/utils.py
+@@ -8,1 +8,2 @@
+ x = 1
++y = 2
+"""

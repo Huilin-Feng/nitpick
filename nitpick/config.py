@@ -18,6 +18,8 @@ class Settings:
     max_tokens_per_chunk: int
     # Maximum LLM calls per review; limits cost on very large PRs.
     max_chunks: int
+    # SQLite file that remembers which commits were reviewed.
+    db_path: str
     # Hard cap on inline comments per review, so the bot never floods a PR.
     max_comments: int
 
@@ -39,4 +41,5 @@ class Settings:
             max_tokens_per_chunk=int(os.getenv("MAX_TOKENS_PER_CHUNK", "6000")),
             max_chunks=int(os.getenv("MAX_CHUNKS", "5")),
             max_comments=int(os.getenv("MAX_COMMENTS", "10")),
+            db_path=os.getenv("NITPICK_DB_PATH", "nitpick.db"),
         )
