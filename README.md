@@ -29,7 +29,7 @@ flowchart LR
 | Module | Responsibility |
 | --- | --- |
 | `diff_parser.py` | Parse unified diff into files, hunks and line numbers |
-| `chunker.py` | Group files into LLM-sized chunks, skip binary/deleted files |
+| `chunker.py` | Filter, prioritise and split files into LLM-sized chunks |
 | `reviewer.py` | Call the LLM per chunk, validate and rank comments |
 | `jobs.py` | Fetch the PR, run the review, post it (with fallback) |
 | `main.py` | Webhook endpoint: signature check, event filtering |
@@ -47,6 +47,12 @@ flowchart LR
   number of dropped comments is recorded.
 - **Explicit line numbers in the prompt.** Each diff line is rendered
   with its new-file line number so the model does not have to count.
+- **Split large diffs instead of truncating them.** Files are split at
+  hunk boundaries (and oversized hunks by lines) so nothing is silently
+  dropped. Lock files and generated output are skipped.
+- **Bounded cost.** A review makes at most `MAX_CHUNKS` LLM calls. When a
+  PR is larger than that, source code is reviewed before tests, and tests
+  before config and docs; anything left out is listed in the summary.
 - **Pin the reviewed commit.** Reviews are posted against the head SHA
   that was actually reviewed.
 - **Degrade gracefully.** One failing LLM call does not stop the review,
@@ -102,7 +108,8 @@ planted bugs used to measure review quality.
 
 ## Roadmap
 
-- [ ] Smarter chunking for large PRs (split by hunk/function, file priority, exact token counts)
+- [x] Smarter chunking for large PRs (hunk splitting, file priority, review budget)
+- [ ] Exact token counting with tiktoken
 - [ ] Skip work that was already done (idempotent deliveries, review only new changes)
 - [x] Evaluation harness with planted-issue cases
 - [ ] Evaluation on real pull requests

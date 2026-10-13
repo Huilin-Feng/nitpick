@@ -16,14 +16,21 @@ logger = logging.getLogger(__name__)
 
 
 class Reviewer:
-    def __init__(self, llm: LLMClient, max_tokens_per_chunk: int = 6000, max_comments: int = 10) -> None:
+    def __init__(
+        self,
+        llm: LLMClient,
+        max_tokens_per_chunk: int = 6000,
+        max_comments: int = 10,
+        max_chunks: int = 5,
+    ) -> None:
         self.llm = llm
         self.max_tokens_per_chunk = max_tokens_per_chunk
         self.max_comments = max_comments
+        self.max_chunks = max_chunks
 
     def review(self, diff_text: str) -> ReviewResult:
         files = parse_diff(diff_text)
-        chunks, skipped = build_chunks(files, self.max_tokens_per_chunk)
+        chunks, skipped = build_chunks(files, self.max_tokens_per_chunk, self.max_chunks)
         commentable = {f.path: f.commentable_lines() for f in files}
         added = {f.path: f.added_lines() for f in files}
 

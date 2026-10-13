@@ -47,7 +47,7 @@ def build_reviewer(settings: Settings, llm: LLMClient | None = None) -> Reviewer
         if not settings.openai_api_key:
             raise RuntimeError("OPENAI_API_KEY is not configured.")
         llm = OpenAIClient(settings.openai_api_key, settings.openai_model)
-    return Reviewer(llm, settings.max_tokens_per_chunk, settings.max_comments)
+    return Reviewer(llm, settings.max_tokens_per_chunk, settings.max_comments, settings.max_chunks)
 
 
 def post_review(gh: GitHubClient, job: ReviewJob, result: ReviewResult) -> None:

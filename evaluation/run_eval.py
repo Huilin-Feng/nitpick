@@ -38,6 +38,7 @@ def parse_args(argv: list[str] | None) -> argparse.Namespace:
     p.add_argument("--only", nargs="*", help="run only these case ids")
     p.add_argument("--tolerance", type=int, default=3, help="allowed distance in lines for a hit")
     p.add_argument("--max-tokens", type=int, default=None, help="override MAX_TOKENS_PER_CHUNK")
+    p.add_argument("--max-chunks", type=int, default=None, help="override MAX_CHUNKS")
     # USD per 1M tokens. Defaults are for gpt-4o-mini; check current pricing.
     p.add_argument("--price-in", type=float, default=0.15)
     p.add_argument("--price-out", type=float, default=0.60)
@@ -106,8 +107,11 @@ def main(argv: list[str] | None = None) -> int:
 
     settings = Settings.from_env()
     max_tokens = args.max_tokens or settings.max_tokens_per_chunk
+    max_chunks = args.max_chunks or settings.max_chunks
     llm = build_llm(settings, args.dry_run)
-    reviewer = Reviewer(llm, max_tokens_per_chunk=max_tokens, max_comments=settings.max_comments)
+    reviewer = Reviewer(
+        llm, max_tokens_per_chunk=max_tokens, max_comments=settings.max_comments, max_chunks=max_chunks
+    )
 
     scores: list[RunScore] = []
     for run in range(1, args.runs + 1):
@@ -159,6 +163,7 @@ def main(argv: list[str] | None = None) -> int:
             "label": args.label,
             "model": "dry-run" if args.dry_run else settings.openai_model,
             "max_tokens_per_chunk": max_tokens,
+            "max_chunks": max_chunks,
             "max_comments": settings.max_comments,
             "tolerance": args.tolerance,
             "runs": args.runs,

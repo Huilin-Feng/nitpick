@@ -16,6 +16,8 @@ class Settings:
     webhook_secret: str | None
     # Rough upper bound of diff tokens sent to the LLM in one request.
     max_tokens_per_chunk: int
+    # Maximum LLM calls per review; limits cost on very large PRs.
+    max_chunks: int
     # Hard cap on inline comments per review, so the bot never floods a PR.
     max_comments: int
 
@@ -35,5 +37,6 @@ class Settings:
             github_private_key=private_key,
             webhook_secret=os.getenv("GITHUB_WEBHOOK_SECRET"),
             max_tokens_per_chunk=int(os.getenv("MAX_TOKENS_PER_CHUNK", "6000")),
+            max_chunks=int(os.getenv("MAX_CHUNKS", "5")),
             max_comments=int(os.getenv("MAX_COMMENTS", "10")),
         )

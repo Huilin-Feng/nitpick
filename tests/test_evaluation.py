@@ -27,12 +27,13 @@ def test_real_cases_file_is_valid():
     assert validate_cases(cases) == []
 
 
-def test_baseline_chunker_cannot_see_late_hunk_bug():
-    # Documents a known limitation of the naive chunker. When you improve
-    # chunking (extension point #1), flip this assertion.
+def test_chunker_reaches_late_hunk_bug():
+    # The naive chunker dropped the last hunk of this file, so the planted
+    # bug was never sent to the LLM (0/3 in the baseline evaluation).
     case = next(c for c in load_cases(CASES_FILE) if c.id == "hard_late_hunk")
-    chunks, _ = build_chunks(parse_diff(case.diff_text), max_tokens=6000)
-    assert not any("values[index]" in c.text for c in chunks)
+    chunks, skipped = build_chunks(parse_diff(case.diff_text), max_tokens=6000)
+    assert any("values[index]" in c.text for c in chunks)
+    assert skipped == []
 
 
 def test_validate_reports_line_outside_diff():
