@@ -1,0 +1,12 @@
+diff --git a/app/stats.py b/app/stats.py
+index 5ca62e5..12191d5 100644
+--- a/app/stats.py
++++ b/app/stats.py
+@@ -1,4 +1,4 @@
+-def mean(xs):
+-    if not xs:
++def mean(values):
++    if not values:
+         return 0.0
+-    return sum(xs) / len(xs)
++    return sum(values) / len(values)

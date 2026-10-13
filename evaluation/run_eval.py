@@ -1,0 +1,172 @@
+"""Run nitpick against the evaluation cases and report metrics.
+
+    python -m evaluation.run_eval --dry-run              # free: checks the pipeline only
+    python -m evaluation.run_eval --label baseline       # real run, 3 repeats per case
+    python -m evaluation.run_eval --label baseline --runs 1 --only bug_off_by_one
+
+Results are printed and saved to evaluation/results/<time>_<label>.json,
+including every comment the LLM made, so you can review them by hand.
+"""
+
+import argparse
+import json
+import sys
+import time
+from dataclasses import asdict
+from datetime import datetime
+from pathlib import Path
+
+from evaluation.scoring import RunScore, load_cases, score_comments, summarize, validate_cases
+from nitpick.config import Settings
+from nitpick.reviewer import Reviewer
+
+ROOT = Path(__file__).parent
+
+
+class SilentLLM:
+    """Used by --dry-run: never calls an API and never comments."""
+
+    def complete_json(self, system: str, user: str) -> dict:
+        return {"summary": "", "comments": []}
+
+
+def parse_args(argv: list[str] | None) -> argparse.Namespace:
+    p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    p.add_argument("--cases", type=Path, default=ROOT / "cases.json")
+    p.add_argument("--runs", type=int, default=3, help="repeat each case to average out LLM randomness")
+    p.add_argument("--label", default="run", help="name for this experiment, e.g. baseline")
+    p.add_argument("--only", nargs="*", help="run only these case ids")
+    p.add_argument("--tolerance", type=int, default=3, help="allowed distance in lines for a hit")
+    p.add_argument("--max-tokens", type=int, default=None, help="override MAX_TOKENS_PER_CHUNK")
+    # USD per 1M tokens. Defaults are for gpt-4o-mini; check current pricing.
+    p.add_argument("--price-in", type=float, default=0.15)
+    p.add_argument("--price-out", type=float, default=0.60)
+    p.add_argument("--dry-run", action="store_true", help="use a fake LLM; costs nothing")
+    p.add_argument("--no-save", action="store_true")
+    return p.parse_args(argv)
+
+
+def build_llm(settings: Settings, dry_run: bool):
+    if dry_run:
+        return SilentLLM()
+    if not settings.openai_api_key:
+        sys.exit("OPENAI_API_KEY is not set (or use --dry-run).")
+    from nitpick.llm import OpenAIClient
+
+    return OpenAIClient(settings.openai_api_key, settings.openai_model)
+
+
+def fmt(value: float | None, pct: bool = True) -> str:
+    if value is None:
+        return "n/a"
+    return f"{value:.0%}" if pct else f"{value:.4f}"
+
+
+def print_report(scores: list[RunScore], summary: dict, label: str) -> None:
+    print(f"\n=== {label} ===")
+    print(f"{'case':<26}{'hits':>8}{'comments/run':>14}{'notes/run':>11}{'dropped/run':>13}")
+    for case_id in dict.fromkeys(s.case_id for s in scores):
+        rs = [s for s in scores if s.case_id == case_id]
+        if rs[0].is_clean:
+            hits = "clean"
+        else:
+            hits = f"{sum(s.expected_hit for s in rs)}/{sum(s.expected_total for s in rs)}"
+        avg_comments = sum(s.comments_total for s in rs) / len(rs)
+        avg_notes = sum(s.notes_total for s in rs) / len(rs)
+        avg_dropped = sum(s.dropped_comments for s in rs) / len(rs)
+        print(f"{case_id:<26}{hits:>8}{avg_comments:>14.1f}{avg_notes:>11.1f}{avg_dropped:>13.1f}")
+
+    print()
+    print(f"recall:                 {fmt(summary['recall'])}  per run: {[fmt(r) for r in summary['recall_per_run']]}")
+    print(f"recall incl. notes:     {fmt(summary['recall_with_notes'])}")
+    print(f"strict precision:       {fmt(summary['strict_precision'])}")
+    print(f"false positives/clean:  {summary['false_positives_per_clean_pr']:.2f}  (notes: {summary['notes_per_clean_pr']:.2f})")
+    print(f"validity:               {fmt(summary['validity'])}")
+    for cat, r in summary["recall_by_category"].items():
+        print(f"  recall[{cat}]: {fmt(r)}")
+    print(f"failed chunks:          {summary['failed_chunks']}")
+    print(f"avg cost per review:    ${summary['avg_cost_usd_per_review']:.5f}")
+    print(f"avg seconds per review: {summary['avg_seconds_per_review']:.1f}")
+    print(f"total cost:             ${summary['total_cost_usd']:.4f}")
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = parse_args(argv)
+    cases = load_cases(args.cases)
+    if args.only:
+        cases = [c for c in cases if c.id in set(args.only)]
+
+    errors = validate_cases(cases)
+    if errors:
+        print("cases.json has problems:", *errors, sep="\n  ")
+        return 1
+    if not cases:
+        print("No cases selected.")
+        return 1
+
+    settings = Settings.from_env()
+    max_tokens = args.max_tokens or settings.max_tokens_per_chunk
+    llm = build_llm(settings, args.dry_run)
+    reviewer = Reviewer(llm, max_tokens_per_chunk=max_tokens, max_comments=settings.max_comments)
+
+    scores: list[RunScore] = []
+    for run in range(1, args.runs + 1):
+        for case in cases:
+            if hasattr(llm, "reset_usage"):
+                llm.reset_usage()
+            started = time.perf_counter()
+            result = reviewer.review(case.diff_text)
+            seconds = time.perf_counter() - started
+
+            hit, correct, hit_cats, missed_cats = score_comments(case, result.comments, args.tolerance)
+            hit_with_notes, _, _, _ = score_comments(case, result.comments + result.notes, args.tolerance)
+            usage = getattr(llm, "usage", {})
+            scores.append(RunScore(
+                case_id=case.id,
+                run=run,
+                expected_total=len(case.expected),
+                expected_hit=hit,
+                comments_total=len(result.comments),
+                comments_correct=correct,
+                dropped_comments=result.dropped_comments,
+                notes_total=len(result.notes),
+                expected_hit_with_notes=hit_with_notes,
+                failed_chunks=result.failed_chunks,
+                skipped_files=len(result.skipped_files),
+                prompt_tokens=usage.get("prompt_tokens", 0),
+                completion_tokens=usage.get("completion_tokens", 0),
+                seconds=seconds,
+                is_clean=case.is_clean,
+                hit_categories=hit_cats,
+                missed_categories=missed_cats,
+                comments=[
+                    {"path": c.path, "line": c.line, "severity": c.severity.value, "message": c.message, "kind": kind}
+                    for kind, group in (("inline", result.comments), ("note", result.notes))
+                    for c in group
+                ],
+            ))
+            print(f"run {run}/{args.runs}  {case.id:<26} hits {hit}/{len(case.expected)}  "
+                  f"comments {len(result.comments)}  notes {len(result.notes)}")
+
+    summary = summarize(scores, args.price_in, args.price_out)
+    print_report(scores, summary, args.label)
+
+    if not args.no_save:
+        out_dir = ROOT / "results"
+        out_dir.mkdir(exist_ok=True)
+        out = out_dir / f"{datetime.now():%Y%m%d-%H%M%S}_{args.label}.json"
+        config = {
+            "label": args.label,
+            "model": "dry-run" if args.dry_run else settings.openai_model,
+            "max_tokens_per_chunk": max_tokens,
+            "max_comments": settings.max_comments,
+            "tolerance": args.tolerance,
+            "runs": args.runs,
+        }
+        out.write_text(json.dumps({"config": config, "summary": summary, "scores": [asdict(s) for s in scores]}, indent=2))
+        print(f"\nsaved {out.relative_to(ROOT.parent)}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

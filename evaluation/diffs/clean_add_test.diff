@@ -1,0 +1,15 @@
+diff --git a/tests/test_money.py b/tests/test_money.py
+new file mode 100644
+index 0000000..39c5fe9
+--- /dev/null
++++ b/tests/test_money.py
+@@ -0,0 +1,9 @@
++from app.money import to_cents
++
++
++def test_to_cents_whole_dollars():
++    assert to_cents(3) == 300
++
++
++def test_to_cents_handles_fractions():
++    assert to_cents(2.5) == 250

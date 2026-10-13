@@ -1,0 +1,11 @@
+import sqlite3
+
+
+def connect(path="app.db"):
+    return sqlite3.connect(path)
+
+
+def find_user(conn, name):
+    cursor = conn.cursor()
+    cursor.execute(f"SELECT id, name, email FROM users WHERE name = '{name}'")
+    return cursor.fetchone()

@@ -1,0 +1,17 @@
+diff --git a/app/dedupe.py b/app/dedupe.py
+index 3ff3efb..b4e2a39 100644
+--- a/app/dedupe.py
++++ b/app/dedupe.py
+@@ -1,2 +1,12 @@
+ def normalize(email):
+     return email.strip().lower()
++
++
++def unique_emails(emails):
++    """Remove duplicates while keeping order. Called with ~1M emails nightly."""
++    seen = []
++    for e in emails:
++        e = normalize(e)
++        if e not in seen:
++            seen.append(e)
++    return seen

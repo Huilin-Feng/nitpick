@@ -1,0 +1,206 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "id": "bug_off_by_one",
+      "description": "Refactor to 1-based page numbers introduces an off-by-one.",
+      "diff": "diffs/bug_off_by_one.diff",
+      "expected": [
+        {
+          "category": "bug",
+          "note": "range(1, total) skips the last page",
+          "locations": [
+            {"path": "app/pagination.py", "lines": [12, 13]}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bug_mutable_default",
+      "description": "Optional cart argument uses a mutable default.",
+      "diff": "diffs/bug_mutable_default.diff",
+      "expected": [
+        {
+          "category": "bug",
+          "note": "mutable default list is shared across calls",
+          "locations": [
+            {"path": "app/cart.py", "lines": [1, 1]}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bug_swallowed_exception",
+      "description": "Error handling added around a payment call.",
+      "diff": "diffs/bug_swallowed_exception.diff",
+      "expected": [
+        {
+          "category": "bug",
+          "note": "bare except hides payment failures, then reports success",
+          "locations": [
+            {"path": "app/payments.py", "lines": [11, 12]}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bug_unclosed_file",
+      "description": "New config loader.",
+      "diff": "diffs/bug_unclosed_file.diff",
+      "expected": [
+        {
+          "category": "bug",
+          "note": "file opened without a context manager is never closed",
+          "locations": [
+            {"path": "app/config_loader.py", "lines": [7, 8]}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bug_none_access",
+      "description": "Lookup helper for user emails.",
+      "diff": "diffs/bug_none_access.diff",
+      "expected": [
+        {
+          "category": "bug",
+          "note": "USERS.get may return None, then subscripting fails",
+          "locations": [
+            {"path": "app/users.py", "lines": [8, 9]}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bug_is_comparison",
+      "description": "Login check uses 'is' with a string literal.",
+      "diff": "diffs/bug_is_comparison.diff",
+      "expected": [
+        {
+          "category": "bug",
+          "note": "'is' compares identity, not string equality",
+          "locations": [
+            {"path": "app/status.py", "lines": [6, 6]}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sec_sql_injection",
+      "description": "Query built with an f-string.",
+      "diff": "diffs/sec_sql_injection.diff",
+      "expected": [
+        {
+          "category": "security",
+          "note": "user input formatted into SQL",
+          "locations": [
+            {"path": "app/db.py", "lines": [10, 10]}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sec_hardcoded_key",
+      "description": "Weather API key added as a constant.",
+      "diff": "diffs/sec_hardcoded_key.diff",
+      "expected": [
+        {
+          "category": "security",
+          "note": "API key committed in source code",
+          "locations": [
+            {"path": "app/weather.py", "lines": [4, 4]}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sec_shell_injection",
+      "description": "Ping helper with shell=True.",
+      "diff": "diffs/sec_shell_injection.diff",
+      "expected": [
+        {
+          "category": "security",
+          "note": "request data passed to a shell command",
+          "locations": [
+            {"path": "app/tools.py", "lines": [6, 6]}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perf_n_plus_one",
+      "description": "Batch lookup replaced by per-row lookups.",
+      "diff": "diffs/perf_n_plus_one.diff",
+      "expected": [
+        {
+          "category": "performance",
+          "note": "one database query per order instead of one batch query",
+          "locations": [
+            {"path": "app/reports.py", "lines": [3, 4]}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perf_list_membership",
+      "description": "Deduplication over a large list.",
+      "diff": "diffs/perf_list_membership.diff",
+      "expected": [
+        {
+          "category": "performance",
+          "note": "membership test on a list makes this O(n^2); use a set",
+          "locations": [
+            {"path": "app/dedupe.py", "lines": [7, 11]}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "clean_rename",
+      "description": "Pure rename of a variable.",
+      "diff": "diffs/clean_rename.diff",
+      "expected": []
+    },
+    {
+      "id": "clean_docstring",
+      "description": "Docstrings only.",
+      "diff": "diffs/clean_docstring.diff",
+      "expected": []
+    },
+    {
+      "id": "clean_add_test",
+      "description": "Adds correct unit tests.",
+      "diff": "diffs/clean_add_test.diff",
+      "expected": []
+    },
+    {
+      "id": "hard_cross_file",
+      "description": "Signature change in one file, stale caller in another.",
+      "diff": "diffs/hard_cross_file.diff",
+      "expected": [
+        {
+          "category": "bug",
+          "note": "invite() calls create_user without the new required role argument",
+          "locations": [
+            {"path": "app/api.py", "lines": [8, 9]},
+            {"path": "app/services.py", "lines": [4, 4]}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hard_late_hunk",
+      "description": "Large file; the only real bug is in the last hunk.",
+      "diff": "diffs/hard_late_hunk.diff",
+      "expected": [
+        {
+          "category": "bug",
+          "note": "values[len(values)] raises IndexError",
+          "locations": [
+            {"path": "app/metrics.py", "lines": [1403, 1404]}
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+diff --git a/app/pagination.py b/app/pagination.py
+index e862d1c..bdd1142 100644
+--- a/app/pagination.py
++++ b/app/pagination.py
+@@ -6,8 +6,10 @@ def page_count(total_items, page_size):
+ 
+ 
+ def get_pages(items, page_size):
++    """Split items into pages, numbering pages from 1."""
+     pages = []
+-    for i in range(page_count(len(items), page_size)):
+-        start = i * page_size
++    total = page_count(len(items), page_size)
++    for page_number in range(1, total):
++        start = (page_number - 1) * page_size
+         pages.append(items[start:start + page_size])
+     return pages

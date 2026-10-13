@@ -1,0 +1,13 @@
+diff --git a/app/users.py b/app/users.py
+index 8a9c3e2..a1520eb 100644
+--- a/app/users.py
++++ b/app/users.py
+@@ -2,3 +2,8 @@ USERS = {
+     1: {"name": "Ada", "email": "ada@example.com"},
+     2: {"name": "Linus", "email": "linus@example.com"},
+ }
++
++
++def get_email(user_id):
++    user = USERS.get(user_id)
++    return user["email"].lower()
