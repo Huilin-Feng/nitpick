@@ -3,7 +3,7 @@ import json
 import pytest
 
 import nitpick.agent as agent_module
-from nitpick.agent import LAST_STEP_REMINDER, AgentReviewer
+from nitpick.agent import LAST_STEP_REMINDER, AgentReviewer, step_status
 from nitpick.llm import ChatTurn, ToolCall
 from nitpick.repo_snapshot import RepoSnapshot
 from nitpick.reviewer import Reviewer
@@ -47,6 +47,10 @@ def make_agent(turns, fallback_responses=(PIPELINE_ANSWER,), **kwargs):
     return agent, llm, pipeline_llm
 
 
+def tool_messages(request):
+    return [m for m in request if m["role"] == "tool"]
+
+
 BUG = {"path": "app/services.py", "line": 1, "severity": "bug", "message": "api.py still calls total()"}
 
 
@@ -67,8 +71,9 @@ def test_tool_result_is_sent_back_with_matching_id(snapshot):
     result = agent.review(DIFF, snapshot)
 
     second_request = llm.requests[1]
-    assistant, tool = second_request[-2], second_request[-1]
+    assistant, tool, status = second_request[-3], second_request[-2], second_request[-1]
     assert assistant["tool_calls"][0]["id"] == "c7"
+    assert status == {"role": "user", "content": step_status(1, 8)}
     assert tool == {"role": "tool", "tool_call_id": "c7", "content": "app/api.py:1: from app.services import total"}
     assert (result.agent_steps, result.agent_tool_calls) == (2, 1)
 
@@ -100,8 +105,8 @@ def test_parallel_tool_calls_each_get_a_result(snapshot):
 def test_bad_tool_calls_become_errors_for_the_model(snapshot, bad_call, expected):
     agent, llm, _ = make_agent([ChatTurn(None, [bad_call]), submit([])])
     result = agent.review(DIFF, snapshot)
-    tool_msg = llm.requests[1][-1]
-    assert tool_msg["role"] == "tool" and tool_msg["content"].startswith("Error:")
+    tool_msg = tool_messages(llm.requests[1])[-1]
+    assert tool_msg["content"].startswith("Error:")
     assert expected in tool_msg["content"]
     assert result.mode == "agent"  # the agent recovered and finished
 
@@ -113,7 +118,9 @@ def test_submitted_comments_use_the_pipeline_rules(snapshot):
         {"path": "app/api.py", "line": 1, "severity": "bug", "message": "not in the diff"},
         {"path": "app/services.py", "line": 1, "severity": "nonsense", "message": "bad severity"},
     ]
-    result = make_agent([submit(comments)])[0].review(DIFF, snapshot)
+    # The off-diff comment triggers one resubmit request; the model sends
+    # the same list again, which is then accepted with the usual rules.
+    result = make_agent([submit(comments), submit(comments)])[0].review(DIFF, snapshot)
     assert len(result.comments) == 1
     assert [n.line for n in result.notes] == [2]
     assert result.dropped_comments == 2
@@ -175,3 +182,146 @@ def test_incremental_review_respects_position_diff(snapshot):
     result = make_agent([submit([BUG])])[0].review(DIFF, snapshot, position_diff_text=position_diff)
     assert result.comments == []
     assert [n.line for n in result.notes] == [1]
+
+
+def test_trace_records_each_tool_call(snapshot):
+    turns = [
+        ChatTurn(None, [call("search_code", {"query": "total"}, "a"), call("read_file", {"path": "app/api.py"}, "b")]),
+        submit([]),
+    ]
+    result = make_agent(turns)[0].review(DIFF, snapshot)
+    assert result.agent_trace == ['search_code({"query": "total"})', 'read_file({"path": "app/api.py"})']
+
+
+def test_trace_is_kept_on_fallback_and_reset_between_reviews(snapshot):
+    lookups = [ChatTurn(None, [call("search_code", {"query": "total"}, f"c{i}")]) for i in range(2)]
+    agent, llm, _ = make_agent(lookups + [submit([])], fallback_responses=(PIPELINE_ANSWER,), max_steps=2)
+    first = agent.review(DIFF, snapshot)
+    assert first.agent_fallback == "max_steps" and len(first.agent_trace) == 2
+    second = agent.review(DIFF, snapshot)
+    assert second.agent_trace == []
+
+
+def test_duplicate_call_is_not_run_again(snapshot):
+    turns = [
+        ChatTurn(None, [call("read_file", {"path": "app/api.py", "start_line": 1}, "a")]),
+        # Same arguments in a different key order still count as a repeat.
+        ChatTurn(None, [call("read_file", {"start_line": 1, "path": "app/api.py"}, "b")]),
+        submit([]),
+    ]
+    agent, llm, _ = make_agent(turns)
+    result = agent.review(DIFF, snapshot)
+
+    repeat = tool_messages(llm.requests[2])[-1]
+    assert repeat["tool_call_id"] == "b"
+    assert "already made this exact call at step 1" in repeat["content"]
+    assert "from app.services" not in repeat["content"]  # the file was not resent
+    assert result.agent_trace[1].endswith("[duplicate]")
+    assert result.agent_tool_calls == 2
+
+
+def test_same_tool_with_different_arguments_is_not_a_duplicate(snapshot):
+    turns = [
+        ChatTurn(None, [call("search_code", {"query": "total"}, "a")]),
+        ChatTurn(None, [call("search_code", {"query": "sum_items"}, "b")]),
+        submit([]),
+    ]
+    agent, llm, _ = make_agent(turns)
+    result = agent.review(DIFF, snapshot)
+    assert "already made" not in tool_messages(llm.requests[2])[-1]["content"]
+    assert not any(t.endswith("[duplicate]") for t in result.agent_trace)
+
+
+def test_duplicates_are_tracked_per_review(snapshot):
+    lookup = lambda i: ChatTurn(None, [call("search_code", {"query": "total"}, f"c{i}")])
+    agent, llm, _ = make_agent([lookup(1), submit([]), lookup(2), submit([])])
+    agent.review(DIFF, snapshot)
+    agent.review(DIFF, snapshot)
+    assert "already made" not in tool_messages(llm.requests[3])[-1]["content"]
+
+
+def test_status_message_is_replaced_by_reminder_near_the_end(snapshot):
+    lookups = [ChatTurn(None, [call("search_code", {"query": f"q{i}x"}, f"c{i}")]) for i in range(3)]
+    agent, llm, _ = make_agent(lookups, max_steps=3)
+    agent.review(DIFF, snapshot)
+    # After step 1: status. After step 2 (the one before last): no status,
+    # because step 3 starts with LAST_STEP_REMINDER.
+    assert llm.requests[1][-1] == {"role": "user", "content": step_status(1, 3)}
+    assert llm.requests[2][-1] == {"role": "user", "content": LAST_STEP_REMINDER}
+    assert step_status(2, 3) not in str(llm.requests[2])
+
+
+def test_self_check_filters_unsure_and_pre_existing(snapshot):
+    comments = [
+        {**BUG, "introduced_by_this_pr": True, "confidence": "high"},
+        {**BUG, "message": "old behavior", "introduced_by_this_pr": False, "confidence": "high"},
+        {**BUG, "message": "maybe", "introduced_by_this_pr": True, "confidence": "medium"},
+        {**BUG, "message": "guess", "introduced_by_this_pr": True, "confidence": "low"},
+    ]
+    result = make_agent([submit(comments)])[0].review(DIFF, snapshot)
+    assert [c.message for c in result.comments] == ["api.py still calls total()"]
+    assert result.agent_filtered == 3
+    assert result.dropped_comments == 0  # filtered is counted separately
+
+
+def test_self_check_keeps_comments_without_the_fields(snapshot):
+    # A model that ignores the new fields behaves as before.
+    result = make_agent([submit([BUG])])[0].review(DIFF, snapshot)
+    assert len(result.comments) == 1 and result.agent_filtered == 0
+
+
+def test_submit_schema_requires_self_check_fields():
+    from nitpick.agent import TOOLS
+
+    submit_tool = next(t for t in TOOLS if t["function"]["name"] == "submit_review")
+    required = submit_tool["function"]["parameters"]["properties"]["comments"]["items"]["required"]
+    assert {"introduced_by_this_pr", "confidence"} <= set(required)
+
+
+OFF_DIFF = {"path": "app/api.py", "line": 1, "severity": "bug", "message": "still imports total"}
+
+
+def test_off_diff_comment_triggers_one_resubmit(snapshot):
+    turns = [submit([OFF_DIFF], call_id="s1"), submit([BUG], call_id="s2")]
+    agent, llm, _ = make_agent(turns)
+    result = agent.review(DIFF, snapshot)
+
+    feedback = tool_messages(llm.requests[1])[-1]
+    assert feedback["tool_call_id"] == "s1"
+    assert "app/api.py:1" in feedback["content"] and "not in the diff" in feedback["content"]
+    assert [c.line for c in result.comments] == [1]
+    assert result.agent_steps == 2
+    assert result.agent_trace[0].endswith("[resubmit requested]")
+
+
+def test_second_off_diff_submit_is_accepted_and_dropped(snapshot):
+    turns = [submit([OFF_DIFF], call_id="s1"), submit([OFF_DIFF], call_id="s2")]
+    agent, llm, _ = make_agent(turns)
+    result = agent.review(DIFF, snapshot)
+    assert len(llm.requests) == 2  # no third request: only one retry
+    assert result.comments == [] and result.dropped_comments == 1
+
+
+def test_no_resubmit_on_last_step(snapshot):
+    lookup = ChatTurn(None, [call("search_code", {"query": "total"}, "c1")])
+    agent, llm, _ = make_agent([lookup, submit([OFF_DIFF])], max_steps=2)
+    result = agent.review(DIFF, snapshot)
+    assert len(llm.requests) == 2
+    assert result.mode == "agent" and result.dropped_comments == 1
+
+
+def test_context_line_comment_does_not_trigger_resubmit(snapshot):
+    note = {"path": "app/services.py", "line": 2, "severity": "style", "message": "context"}
+    agent, llm, _ = make_agent([submit([note])])
+    result = agent.review(DIFF, snapshot)
+    assert len(llm.requests) == 1
+    assert [n.line for n in result.notes] == [2]
+
+
+def test_resubmit_flag_resets_between_reviews(snapshot):
+    turns = [submit([OFF_DIFF], call_id="a"), submit([BUG], call_id="b"),
+             submit([OFF_DIFF], call_id="c"), submit([BUG], call_id="d")]
+    agent, llm, _ = make_agent(turns)
+    agent.review(DIFF, snapshot)
+    second = agent.review(DIFF, snapshot)
+    assert len(llm.requests) == 4 and len(second.comments) == 1

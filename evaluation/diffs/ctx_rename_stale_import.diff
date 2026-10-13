@@ -1,0 +1,13 @@
+diff --git a/app/formatting.py b/app/formatting.py
+index 9af8cb4..8d50634 100644
+--- a/app/formatting.py
++++ b/app/formatting.py
+@@ -1,7 +1,7 @@
+ from datetime import date
+ 
+ 
+-def format_date(d: date) -> str:
++def format_day(d: date) -> str:
+     return d.strftime("%Y-%m-%d")
+ 
+ 

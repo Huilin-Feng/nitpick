@@ -114,6 +114,20 @@ class CommentPlacer:
         return inline, notes, dropped
 
 
+    def off_diff(self, raws: list) -> list[ReviewComment]:
+        """Valid comments whose path:line is not in the diff at all.
+
+        These would be dropped by place(); the agent uses this to ask the
+        model to re-anchor them before giving up on them.
+        """
+        out = []
+        for raw in raws:
+            comment = _to_comment(raw)
+            if comment is not None and comment.line not in self.commentable.get(comment.path, set()):
+                out.append(comment)
+        return out
+
+
 def finalize_comments(
     comments: list[ReviewComment], notes: list[ReviewComment], limit: int
 ) -> tuple[list[ReviewComment], list[ReviewComment], int]:

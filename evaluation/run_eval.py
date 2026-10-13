@@ -3,6 +3,7 @@
     python -m evaluation.run_eval --dry-run              # free: checks the pipeline only
     python -m evaluation.run_eval --label baseline       # real run, 3 repeats per case
     python -m evaluation.run_eval --label baseline --runs 1 --only bug_off_by_one
+    python -m evaluation.run_eval --mode agent --label agent     # agent mode, same cases
 
 Results are printed and saved to evaluation/results/<time>_<label>.json,
 including every comment the LLM made, so you can review them by hand.
@@ -16,8 +17,11 @@ from dataclasses import asdict
 from datetime import datetime
 from pathlib import Path
 
-from evaluation.scoring import RunScore, load_cases, score_comments, summarize, validate_cases
-from nitpick.config import Settings
+from evaluation.scoring import RunScore, load_cases, score_comments, summarize, summarize_agent, validate_cases
+from nitpick.agent import AgentReviewer
+from nitpick.config import REVIEW_MODES, Settings
+from nitpick.llm import ChatTurn, ToolCall
+from nitpick.repo_snapshot import RepoSnapshot
 from nitpick.reviewer import Reviewer
 
 ROOT = Path(__file__).parent
@@ -29,6 +33,12 @@ class SilentLLM:
     def complete_json(self, system: str, user: str) -> dict:
         return {"summary": "", "comments": []}
 
+    def chat(self, messages: list[dict], tools: list[dict]) -> ChatTurn:
+        # Submit an empty review straight away, so --dry-run also exercises
+        # the agent loop end to end without spending anything.
+        args = {"summary": "", "comments": []}
+        return ChatTurn(None, [ToolCall("dry-run", "submit_review", args, json.dumps(args))])
+
 
 def parse_args(argv: list[str] | None) -> argparse.Namespace:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -39,6 +49,9 @@ def parse_args(argv: list[str] | None) -> argparse.Namespace:
     p.add_argument("--tolerance", type=int, default=3, help="allowed distance in lines for a hit")
     p.add_argument("--max-tokens", type=int, default=None, help="override MAX_TOKENS_PER_CHUNK")
     p.add_argument("--max-chunks", type=int, default=None, help="override MAX_CHUNKS")
+    p.add_argument("--mode", choices=REVIEW_MODES, default=None, help="override REVIEW_MODE")
+    p.add_argument("--agent-max-steps", type=int, default=None, help="override AGENT_MAX_STEPS")
+    p.add_argument("--agent-max-tokens", type=int, default=None, help="override AGENT_MAX_TOKENS")
     # USD per 1M tokens. Defaults are for gpt-4o-mini; check current pricing.
     p.add_argument("--price-in", type=float, default=0.15)
     p.add_argument("--price-out", type=float, default=0.60)
@@ -61,6 +74,15 @@ def fmt(value: float | None, pct: bool = True) -> str:
     if value is None:
         return "n/a"
     return f"{value:.0%}" if pct else f"{value:.4f}"
+
+
+def print_agent_report(agent: dict) -> None:
+    print(f"agent finished itself:  {fmt(agent['agent_finished_rate'])}  (rest fell back to the pipeline)")
+    print(f"used tools:             {fmt(agent['used_tools_rate'])} of reviews")
+    print(f"avg steps / tool calls: {agent['avg_steps']:.1f} / {agent['avg_tool_calls']:.1f}")
+    print(f"self-check filtered:    {agent['avg_filtered']:.1f} comments per review")
+    for reason, count in agent["fallbacks"].items():
+        print(f"  fallback[{reason}]: {count}")
 
 
 def print_report(scores: list[RunScore], summary: dict, label: str) -> None:
@@ -108,9 +130,25 @@ def main(argv: list[str] | None = None) -> int:
     settings = Settings.from_env()
     max_tokens = args.max_tokens or settings.max_tokens_per_chunk
     max_chunks = args.max_chunks or settings.max_chunks
+    mode = args.mode or settings.review_mode
+    agent_max_steps = args.agent_max_steps or settings.agent_max_steps
+    agent_max_tokens = args.agent_max_tokens or settings.agent_max_tokens
+
+    if mode == "agent":
+        missing = [c.id for c in cases if c.snapshot_dir is None]
+        if missing:
+            print("agent mode needs fixtures/<id>/after/ for:", *missing, sep="\n  ")
+            return 1
+
     llm = build_llm(settings, args.dry_run)
     reviewer = Reviewer(
         llm, max_tokens_per_chunk=max_tokens, max_comments=settings.max_comments, max_chunks=max_chunks
+    )
+    # One LLM client serves both the agent and its pipeline fallback, so
+    # the usage counted per case includes fallback calls: the cost is honest.
+    agent = AgentReviewer(
+        llm, fallback=reviewer, max_steps=agent_max_steps, max_tokens=agent_max_tokens,
+        max_tokens_per_chunk=max_tokens, max_comments=settings.max_comments,
     )
 
     scores: list[RunScore] = []
@@ -119,7 +157,10 @@ def main(argv: list[str] | None = None) -> int:
             if hasattr(llm, "reset_usage"):
                 llm.reset_usage()
             started = time.perf_counter()
-            result = reviewer.review(case.diff_text)
+            if mode == "agent":
+                result = agent.review(case.diff_text, RepoSnapshot(case.snapshot_dir))
+            else:
+                result = reviewer.review(case.diff_text)
             seconds = time.perf_counter() - started
 
             hit, correct, hit_cats, missed_cats = score_comments(case, result.comments, args.tolerance)
@@ -148,12 +189,26 @@ def main(argv: list[str] | None = None) -> int:
                     for kind, group in (("inline", result.comments), ("note", result.notes))
                     for c in group
                 ],
+                mode=result.mode,
+                agent_steps=result.agent_steps,
+                agent_tool_calls=result.agent_tool_calls,
+                agent_fallback=result.agent_fallback,
+                agent_trace=result.agent_trace,
+                agent_filtered=result.agent_filtered,
             ))
+            agent_info = ""
+            if mode == "agent":
+                agent_info = f"  steps {result.agent_steps}  tools {result.agent_tool_calls}"
+                if result.agent_fallback:
+                    agent_info += f"  fallback={result.agent_fallback}"
             print(f"run {run}/{args.runs}  {case.id:<26} hits {hit}/{len(case.expected)}  "
-                  f"comments {len(result.comments)}  notes {len(result.notes)}")
+                  f"comments {len(result.comments)}  notes {len(result.notes)}{agent_info}")
 
     summary = summarize(scores, args.price_in, args.price_out)
     print_report(scores, summary, args.label)
+    if mode == "agent":
+        summary["agent"] = summarize_agent(scores)
+        print_agent_report(summary["agent"])
 
     if not args.no_save:
         out_dir = ROOT / "results"
@@ -161,6 +216,9 @@ def main(argv: list[str] | None = None) -> int:
         out = out_dir / f"{datetime.now():%Y%m%d-%H%M%S}_{args.label}.json"
         config = {
             "label": args.label,
+            "mode": mode,
+            "agent_max_steps": agent_max_steps if mode == "agent" else None,
+            "agent_max_tokens": agent_max_tokens if mode == "agent" else None,
             "model": "dry-run" if args.dry_run else settings.openai_model,
             "max_tokens_per_chunk": max_tokens,
             "max_chunks": max_chunks,

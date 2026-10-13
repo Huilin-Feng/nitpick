@@ -23,7 +23,7 @@ def _comment(path="app/utils.py", line=2):
 def test_real_cases_file_is_valid():
     # Guards against typos in cases.json, e.g. a line range outside the diff.
     cases = load_cases(CASES_FILE)
-    assert len(cases) == 16
+    assert len(cases) == 21
     assert validate_cases(cases) == []
 
 

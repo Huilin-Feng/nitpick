@@ -1,0 +1,627 @@
+{
+  "config": {
+    "label": "agent-ctx",
+    "mode": "agent",
+    "agent_max_steps": 8,
+    "agent_max_tokens": 60000,
+    "model": "gpt-4o-mini",
+    "max_tokens_per_chunk": 6000,
+    "max_chunks": 5,
+    "max_comments": 10,
+    "tolerance": 3,
+    "runs": 3
+  },
+  "summary": {
+    "runs": 3,
+    "recall": 1.0,
+    "recall_with_notes": 1.0,
+    "recall_per_run": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "strict_precision": 1.0,
+    "false_positives_per_clean_pr": 1.0,
+    "notes_per_clean_pr": 0.0,
+    "notes_per_review": 0.0,
+    "validity": 1.0,
+    "recall_by_category": {
+      "bug": 1.0
+    },
+    "failed_chunks": 0,
+    "avg_cost_usd_per_review": 0.00065861,
+    "avg_seconds_per_review": 3.9319051028074075,
+    "total_cost_usd": 0.00987915,
+    "agent": {
+      "agent_finished_rate": 1.0,
+      "avg_steps": 3.066666666666667,
+      "avg_tool_calls": 2.533333333333333,
+      "used_tools_rate": 1.0,
+      "fallbacks": {},
+      "avg_filtered": 0.0
+    }
+  },
+  "scores": [
+    {
+      "case_id": "ctx_units_stale_caller",
+      "run": 1,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 2381,
+      "completion_tokens": 166,
+      "seconds": 2.9836799998302013,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/pricing.py",
+          "line": 3,
+          "severity": "bug",
+          "message": "The apply_discount function now expects the discount to be a fraction between 0 and 1, but the callers (e.g., in app/checkout.py) are likely passing a percentage value (e.g., 10 for 10%). This will cause incorrect calculations unless the callers are updated to pass the discount as a fraction.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 2,
+      "agent_fallback": null,
+      "agent_trace": [
+        "search_code({\"query\": \"apply_discount\"})",
+        "read_file({\"path\": \"app/pricing.py\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "ctx_rename_stale_import",
+      "run": 1,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 2111,
+      "completion_tokens": 113,
+      "seconds": 2.549356625182554,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/formatting.py",
+          "line": 4,
+          "severity": "bug",
+          "message": "The function 'format_day' has been renamed from 'format_date', but the caller in 'app/report.py' still references 'format_date'. This will lead to a NameError when 'app/report.py' is executed.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 1,
+      "agent_fallback": null,
+      "agent_trace": [
+        "search_code({\"query\":\"format_date\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "ctx_shared_cache_mutation",
+      "run": 1,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 2167,
+      "completion_tokens": 105,
+      "seconds": 3.8826903339941055,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/catalog.py",
+          "line": 10,
+          "severity": "bug",
+          "message": "The sorting operation modifies the original list in place. If the original order of items is needed later, consider using sorted(items, key=lambda item: item['price']) to avoid side effects.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 1,
+      "agent_fallback": null,
+      "agent_trace": [
+        "read_file({\"path\":\"app/catalog.py\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "ctx_rename_all_updated",
+      "run": 1,
+      "expected_total": 0,
+      "expected_hit": 0,
+      "comments_total": 1,
+      "comments_correct": 0,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 2255,
+      "completion_tokens": 164,
+      "seconds": 4.714271333068609,
+      "is_clean": true,
+      "hit_categories": [],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/text.py",
+          "line": 4,
+          "severity": "bug",
+          "message": "The function '_to_slug' is being used in the 'post_url' function, but there are no existing calls to '_slugify'. This may indicate that the function was not properly updated in all places where it was used, potentially leading to a NameError if '_slugify' was called elsewhere in the codebase.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 2,
+      "agent_fallback": null,
+      "agent_trace": [
+        "search_code({\"query\": \"_slugify\"})",
+        "search_code({\"query\": \"_to_slug\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "ctx_key_has_default",
+      "run": 1,
+      "expected_total": 0,
+      "expected_hit": 0,
+      "comments_total": 1,
+      "comments_correct": 0,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 2078,
+      "completion_tokens": 123,
+      "seconds": 2.5639601252041757,
+      "is_clean": true,
+      "hit_categories": [],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/client.py",
+          "line": 7,
+          "severity": "bug",
+          "message": "The fetch function now relies on a timeout value from the configuration. If the configuration does not provide a 'timeout' key, this will raise a KeyError. Ensure that the configuration always includes a 'timeout' key or handle the case where it might be missing to avoid runtime errors.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 1,
+      "agent_fallback": null,
+      "agent_trace": [
+        "read_file({\"path\":\"app/client.py\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "ctx_units_stale_caller",
+      "run": 2,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 2381,
+      "completion_tokens": 178,
+      "seconds": 3.5811105829197913,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/pricing.py",
+          "line": 3,
+          "severity": "bug",
+          "message": "The apply_discount function now expects the discount to be a fraction between 0 and 1, but the callers (e.g., in app/checkout.py) are likely passing a percentage value (e.g., 10 for 10%). This will lead to incorrect calculations unless all callers are updated to pass the discount as a fraction. Update the callers to match the new expected input format.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 2,
+      "agent_fallback": null,
+      "agent_trace": [
+        "search_code({\"query\": \"apply_discount\"})",
+        "read_file({\"path\": \"app/pricing.py\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "ctx_rename_stale_import",
+      "run": 2,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 2111,
+      "completion_tokens": 122,
+      "seconds": 2.6948135409038514,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/formatting.py",
+          "line": 4,
+          "severity": "bug",
+          "message": "The function 'format_day' has replaced 'format_date', which is still being called in 'app/report.py'. This will lead to a NameError when 'format_date' is called. Update the call in 'app/report.py' to use 'format_day' instead.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 1,
+      "agent_fallback": null,
+      "agent_trace": [
+        "search_code({\"query\":\"format_date\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "ctx_shared_cache_mutation",
+      "run": 2,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 9286,
+      "completion_tokens": 195,
+      "seconds": 6.351352541940287,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/catalog.py",
+          "line": 10,
+          "severity": "bug",
+          "message": "The sorting operation modifies the original list returned by load_items, which may lead to unintended side effects if the original list is reused elsewhere. Consider returning a sorted copy of the list instead: return sorted(items, key=lambda item: item['price']).",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 7,
+      "agent_tool_calls": 6,
+      "agent_fallback": null,
+      "agent_trace": [
+        "read_file({\"path\":\"app/catalog.py\"})",
+        "search_code({\"query\":\"cheapest_first\"})",
+        "search_code({\"query\":\"load_items\"})",
+        "read_file({\"path\":\"app/storage.py\"})",
+        "search_code({\"query\":\"items.sort\"})",
+        "read_file({\"path\":\"app/catalog.py\"}) [duplicate]"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "ctx_rename_all_updated",
+      "run": 2,
+      "expected_total": 0,
+      "expected_hit": 0,
+      "comments_total": 1,
+      "comments_correct": 0,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 2255,
+      "completion_tokens": 151,
+      "seconds": 2.7289685839787126,
+      "is_clean": true,
+      "hit_categories": [],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/text.py",
+          "line": 4,
+          "severity": "bug",
+          "message": "The function '_to_slug' is not referenced anywhere else in the codebase, which may lead to issues if it was intended to replace '_slugify' in other parts of the application. Ensure that all references to '_slugify' are updated to '_to_slug'.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 2,
+      "agent_fallback": null,
+      "agent_trace": [
+        "search_code({\"query\": \"_slugify\"})",
+        "search_code({\"query\": \"_to_slug\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "ctx_key_has_default",
+      "run": 2,
+      "expected_total": 0,
+      "expected_hit": 0,
+      "comments_total": 1,
+      "comments_correct": 0,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 2168,
+      "completion_tokens": 167,
+      "seconds": 2.8701452498789877,
+      "is_clean": true,
+      "hit_categories": [],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/client.py",
+          "line": 7,
+          "severity": "bug",
+          "message": "The fetch function now relies on the get_config function to retrieve a timeout value. If get_config() fails or returns an invalid value (e.g., not an integer), it could lead to runtime errors. Ensure that get_config() is robust and handles errors gracefully, or add error handling in fetch to manage potential issues with the timeout value.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 2,
+      "agent_fallback": null,
+      "agent_trace": [
+        "read_file({\"path\": \"app/client.py\"})",
+        "search_code({\"query\": \"get_config\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "ctx_units_stale_caller",
+      "run": 3,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 2381,
+      "completion_tokens": 161,
+      "seconds": 2.8566892920061946,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/pricing.py",
+          "line": 3,
+          "severity": "bug",
+          "message": "The apply_discount function now expects the discount to be a fraction between 0 and 1, but the callers (e.g., in app/checkout.py) are likely passing a percentage value (e.g., 10 for 10%). This will lead to incorrect calculations unless the callers are updated accordingly.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 2,
+      "agent_fallback": null,
+      "agent_trace": [
+        "search_code({\"query\": \"apply_discount\"})",
+        "read_file({\"path\": \"app/pricing.py\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "ctx_rename_stale_import",
+      "run": 3,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 2111,
+      "completion_tokens": 107,
+      "seconds": 2.4887193329632282,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/formatting.py",
+          "line": 4,
+          "severity": "bug",
+          "message": "The function 'format_date' was renamed to 'format_day', but it is still being called in 'app/report.py'. This will cause a NameError when 'app/report.py' is executed.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 1,
+      "agent_fallback": null,
+      "agent_trace": [
+        "search_code({\"query\":\"format_date\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "ctx_shared_cache_mutation",
+      "run": 3,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 11041,
+      "completion_tokens": 208,
+      "seconds": 8.780972999986261,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/catalog.py",
+          "line": 10,
+          "severity": "bug",
+          "message": "The sorting operation modifies the original list returned by load_items, which can lead to unexpected behavior if the original list is needed later. To avoid this, create a copy of the items list before sorting it: `items = load_items(path).copy()`",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 8,
+      "agent_tool_calls": 7,
+      "agent_fallback": null,
+      "agent_trace": [
+        "read_file({\"path\":\"app/catalog.py\"})",
+        "search_code({\"query\":\"load_items\"})",
+        "read_file({\"path\":\"app/storage.py\"})",
+        "search_code({\"query\":\"cheapest_first\"})",
+        "search_code({\"query\":\"all_items\"})",
+        "search_code({\"query\":\"sort\"})",
+        "search_code({\"query\":\"price\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "ctx_rename_all_updated",
+      "run": 3,
+      "expected_total": 0,
+      "expected_hit": 0,
+      "comments_total": 1,
+      "comments_correct": 0,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 9781,
+      "completion_tokens": 248,
+      "seconds": 7.578324125148356,
+      "is_clean": true,
+      "hit_categories": [],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/text.py",
+          "line": 4,
+          "severity": "bug",
+          "message": "The function '_to_slug' is used in 'post_url', which is called in 'link' in app/views.py. If '_to_slug' fails to handle certain characters correctly, it may lead to incorrect URLs being generated. Ensure that the regex in '_to_slug' is comprehensive enough to handle all edge cases for slug generation.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 7,
+      "agent_tool_calls": 7,
+      "agent_fallback": null,
+      "agent_trace": [
+        "search_code({\"query\": \"_slugify\"})",
+        "search_code({\"query\": \"_to_slug\"})",
+        "read_file({\"path\":\"app/text.py\"})",
+        "search_code({\"query\":\"post_url\"})",
+        "read_file({\"path\":\"app/views.py\"})",
+        "search_code({\"query\":\"post.title\"})",
+        "read_file({\"path\":\"app/views.py\"}) [duplicate]"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "ctx_key_has_default",
+      "run": 3,
+      "expected_total": 0,
+      "expected_hit": 0,
+      "comments_total": 1,
+      "comments_correct": 0,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 2078,
+      "completion_tokens": 111,
+      "seconds": 2.3535218751057982,
+      "is_clean": true,
+      "hit_categories": [],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/client.py",
+          "line": 7,
+          "severity": "bug",
+          "message": "The timeout value is fetched from the configuration without validation. If the configuration does not contain a valid timeout value, it could lead to unexpected behavior or errors. Consider adding validation to ensure the timeout is a positive integer.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 1,
+      "agent_fallback": null,
+      "agent_trace": [
+        "read_file({\"path\":\"app/client.py\"})"
+      ],
+      "agent_filtered": 0
+    }
+  ]
+}

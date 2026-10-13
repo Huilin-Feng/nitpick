@@ -178,11 +178,27 @@ pytest -q
 See [evaluation/README.md](evaluation/README.md) for the benchmark of
 planted bugs used to measure review quality.
 
+## Agent mode (experimental)
+
+`REVIEW_MODE=agent` lets the model read and search the repository before it
+comments. On 5 context-dependent cases it found 9/9 planted bugs versus 2/9
+for the pipeline, at about 7x the cost and with more comments on clean PRs,
+so the pipeline stays the default. Design, results, the iteration log and
+limitations: [docs/agent-mode.md](docs/agent-mode.md).
+
+    python -m evaluation.run_eval --mode agent --label agent
+    python -m evaluation.compare <label-a> <label-b>
+
+
 ## Roadmap
 
 - [x] Smarter chunking for large PRs (hunk splitting, file priority, review budget)
-- [ ] Exact token counting with tiktoken
+- [x] Exact token counting with tiktoken
 - [x] Skip work that was already done (idempotent deliveries, review only new changes)
 - [x] Evaluation harness with planted-issue cases
-- [ ] Evaluation on real pull requests
-- [ ] Per-repository configuration file
+- [x] Evaluation on real pull requests
+- [x] Per-repository configuration file
+- [x] Agent mode prototype with evaluation against the pipeline (see [docs/agent-mode.md](docs/agent-mode.md))
+- [ ] Wire agent mode into the webhook server (download the PR's head commit as a snapshot)
+- [ ] Run the agent only on PRs that rename or change function signatures
+- [ ] Score evaluation comments by content, not only by location

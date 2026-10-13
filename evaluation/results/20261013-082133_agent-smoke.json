@@ -1,0 +1,123 @@
+{
+  "config": {
+    "label": "agent-smoke",
+    "mode": "agent",
+    "agent_max_steps": 8,
+    "agent_max_tokens": 60000,
+    "model": "gpt-4o-mini",
+    "max_tokens_per_chunk": 6000,
+    "max_chunks": 5,
+    "max_comments": 10,
+    "tolerance": 3,
+    "runs": 1
+  },
+  "summary": {
+    "runs": 1,
+    "recall": 1.0,
+    "recall_with_notes": 1.0,
+    "recall_per_run": [
+      1.0
+    ],
+    "strict_precision": 1.0,
+    "false_positives_per_clean_pr": 0.0,
+    "notes_per_clean_pr": 1.0,
+    "notes_per_review": 1.0,
+    "validity": 1.0,
+    "recall_by_category": {
+      "bug": 1.0
+    },
+    "failed_chunks": 0,
+    "avg_cost_usd_per_review": 0.0013635750000000001,
+    "avg_seconds_per_review": 10.198382708476856,
+    "total_cost_usd": 0.0027271500000000002,
+    "agent": {
+      "agent_finished_rate": 1.0,
+      "avg_steps": 8.0,
+      "avg_tool_calls": 8.0,
+      "used_tools_rate": 1.0,
+      "fallbacks": {}
+    }
+  },
+  "scores": [
+    {
+      "case_id": "clean_rename",
+      "run": 1,
+      "expected_total": 0,
+      "expected_hit": 0,
+      "comments_total": 0,
+      "comments_correct": 0,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 1,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 6900,
+      "completion_tokens": 251,
+      "seconds": 9.290795791894197,
+      "is_clean": true,
+      "hit_categories": [],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/stats.py",
+          "line": 3,
+          "severity": "bug",
+          "message": "Returning 0.0 for an empty input list may lead to misleading results when calculating the mean. Consider raising a ValueError or returning None instead.",
+          "kind": "note"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 8,
+      "agent_tool_calls": 8,
+      "agent_fallback": null
+    },
+    {
+      "case_id": "hard_cross_file",
+      "run": 1,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 2,
+      "comments_correct": 2,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 1,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 8721,
+      "completion_tokens": 389,
+      "seconds": 11.105969625059515,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/api.py",
+          "line": 5,
+          "severity": "bug",
+          "message": "The 'signup' function is missing validation for the 'request' dictionary. If 'name' or 'email' keys are not present, it will raise a KeyError. Consider adding validation to ensure these keys exist before accessing them.",
+          "kind": "inline"
+        },
+        {
+          "path": "app/services.py",
+          "line": 4,
+          "severity": "bug",
+          "message": "The 'create_user' function now requires a 'role' parameter, but the 'invite' function does not provide it, which may lead to issues. Ensure that the role is handled correctly or modify the function to accommodate calls without a role.",
+          "kind": "inline"
+        },
+        {
+          "path": "app/api.py",
+          "line": 9,
+          "severity": "bug",
+          "message": "The 'invite' function is also missing validation for the 'request' dictionary. If 'name' or 'email' keys are not present, it will raise a KeyError. Consider adding validation to ensure these keys exist before accessing them.",
+          "kind": "note"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 8,
+      "agent_tool_calls": 8,
+      "agent_fallback": null
+    }
+  ]
+}

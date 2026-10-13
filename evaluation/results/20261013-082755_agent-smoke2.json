@@ -1,0 +1,293 @@
+{
+  "config": {
+    "label": "agent-smoke2",
+    "mode": "agent",
+    "agent_max_steps": 8,
+    "agent_max_tokens": 60000,
+    "model": "gpt-4o-mini",
+    "max_tokens_per_chunk": 6000,
+    "max_chunks": 5,
+    "max_comments": 10,
+    "tolerance": 3,
+    "runs": 3
+  },
+  "summary": {
+    "runs": 3,
+    "recall": 1.0,
+    "recall_with_notes": 1.0,
+    "recall_per_run": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "strict_precision": 1.0,
+    "false_positives_per_clean_pr": 1.0,
+    "notes_per_clean_pr": 0.0,
+    "notes_per_review": 0.0,
+    "validity": 1.0,
+    "recall_by_category": {
+      "bug": 1.0
+    },
+    "failed_chunks": 0,
+    "avg_cost_usd_per_review": 0.00112565,
+    "avg_seconds_per_review": 5.607764909858815,
+    "total_cost_usd": 0.0067539,
+    "agent": {
+      "agent_finished_rate": 1.0,
+      "avg_steps": 5.833333333333333,
+      "avg_tool_calls": 6.333333333333333,
+      "used_tools_rate": 1.0,
+      "fallbacks": {}
+    }
+  },
+  "scores": [
+    {
+      "case_id": "clean_rename",
+      "run": 1,
+      "expected_total": 0,
+      "expected_hit": 0,
+      "comments_total": 1,
+      "comments_correct": 0,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 8223,
+      "completion_tokens": 186,
+      "seconds": 7.9316159170120955,
+      "is_clean": true,
+      "hit_categories": [],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/stats.py",
+          "line": 2,
+          "severity": "bug",
+          "message": "The function now returns 0.0 for an empty input list, which may not be the expected behavior for a mean calculation. Consider raising an exception or returning None instead.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 8,
+      "agent_tool_calls": 7,
+      "agent_fallback": null,
+      "agent_trace": [
+        "read_file({\"path\":\"app/stats.py\"})",
+        "search_code({\"query\":\"mean\"})",
+        "search_code({\"query\":\"mean(\"})",
+        "search_code({\"query\":\"sum(\"})",
+        "read_file({\"path\":\"app/stats.py\"}) [duplicate]",
+        "search_code({\"query\":\"len(\"})",
+        "search_code({\"query\":\"if not values:\"})"
+      ]
+    },
+    {
+      "case_id": "hard_cross_file",
+      "run": 1,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 12341,
+      "completion_tokens": 421,
+      "seconds": 8.364556042011827,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/api.py",
+          "line": 5,
+          "severity": "bug",
+          "message": "The 'create_user' function is called with three arguments in 'signup', but the 'invite' function calls it with only two arguments. This will cause a TypeError when 'invite' is called, as the 'role' argument is missing.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 8,
+      "agent_tool_calls": 14,
+      "agent_fallback": null,
+      "agent_trace": [
+        "search_code({\"query\": \"create_user\"})",
+        "read_file({\"path\": \"app/api.py\"})",
+        "search_code({\"query\": \"invite\"})",
+        "search_code({\"query\": \"signup\"})",
+        "read_file({\"path\": \"app/services.py\"})",
+        "search_code({\"query\": \"USERS\"})",
+        "search_code({\"query\": \"request\"})",
+        "read_file({\"path\": \"app/api.py\"}) [duplicate]",
+        "search_code({\"query\": \"role\"})",
+        "read_file({\"path\": \"app/api.py\"}) [duplicate]",
+        "search_code({\"query\": \"name\"})",
+        "search_code({\"query\": \"email\"})",
+        "search_code({\"query\": \"request[\\\"name\\\"]\"})",
+        "search_code({\"query\": \"request[\\\"email\\\"]\"})"
+      ]
+    },
+    {
+      "case_id": "clean_rename",
+      "run": 2,
+      "expected_total": 0,
+      "expected_hit": 0,
+      "comments_total": 1,
+      "comments_correct": 0,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 8261,
+      "completion_tokens": 211,
+      "seconds": 6.670219250023365,
+      "is_clean": true,
+      "hit_categories": [],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/stats.py",
+          "line": 2,
+          "severity": "bug",
+          "message": "The mean function now returns 0.0 for an empty input list. This is a change in behavior from the previous implementation, which did not handle empty lists and would raise a ZeroDivisionError. Ensure that this change is intended and that all callers of this function can handle a return value of 0.0.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 8,
+      "agent_tool_calls": 7,
+      "agent_fallback": null,
+      "agent_trace": [
+        "read_file({\"path\":\"app/stats.py\"})",
+        "search_code({\"query\":\"mean\"})",
+        "search_code({\"query\":\"sum\"})",
+        "read_file({\"path\":\"app/stats.py\"}) [duplicate]",
+        "search_code({\"query\":\"len\"})",
+        "search_code({\"query\":\"mean(\"})",
+        "search_code({\"query\":\"mean(\"}) [duplicate]"
+      ]
+    },
+    {
+      "case_id": "hard_cross_file",
+      "run": 2,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 2029,
+      "completion_tokens": 132,
+      "seconds": 2.261153707979247,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/api.py",
+          "line": 5,
+          "severity": "bug",
+          "message": "The call to create_user in the signup function is missing a required argument 'role'. This will raise a TypeError when the function is called. You need to provide a role when calling create_user.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 2,
+      "agent_fallback": null,
+      "agent_trace": [
+        "search_code({\"query\": \"create_user\"})",
+        "read_file({\"path\": \"app/services.py\"})"
+      ]
+    },
+    {
+      "case_id": "clean_rename",
+      "run": 3,
+      "expected_total": 0,
+      "expected_hit": 0,
+      "comments_total": 1,
+      "comments_correct": 0,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 7059,
+      "completion_tokens": 191,
+      "seconds": 6.021062042098492,
+      "is_clean": true,
+      "hit_categories": [],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/stats.py",
+          "line": 2,
+          "severity": "bug",
+          "message": "Returning 0.0 for an empty input may not be appropriate for a mean function. Consider raising a ValueError instead to indicate that the mean cannot be computed for an empty list.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 7,
+      "agent_tool_calls": 6,
+      "agent_fallback": null,
+      "agent_trace": [
+        "read_file({\"path\":\"app/stats.py\"})",
+        "search_code({\"query\":\"mean\"})",
+        "search_code({\"query\":\"sum\"})",
+        "read_file({\"path\":\"app/stats.py\",\"start_line\":1,\"end_line\":4})",
+        "search_code({\"query\":\"len\"})",
+        "read_file({\"path\":\"app/stats.py\",\"start_line\":1,\"end_line\":4}) [duplicate]"
+      ]
+    },
+    {
+      "case_id": "hard_cross_file",
+      "run": 3,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 2029,
+      "completion_tokens": 130,
+      "seconds": 2.397982500027865,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/api.py",
+          "line": 5,
+          "severity": "bug",
+          "message": "The call to create_user in the signup function is missing required arguments. The create_user function now requires a 'role' argument, but only 'name' and 'email' are provided.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 2,
+      "agent_fallback": null,
+      "agent_trace": [
+        "search_code({\"query\": \"create_user\"})",
+        "read_file({\"path\": \"app/services.py\"})"
+      ]
+    }
+  ]
+}

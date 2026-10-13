@@ -1,0 +1,14 @@
+diff --git a/app/catalog.py b/app/catalog.py
+index 0bbafb6..2547779 100644
+--- a/app/catalog.py
++++ b/app/catalog.py
+@@ -3,3 +3,9 @@ from app.storage import load_items
+ 
+ def all_items(path):
+     return load_items(path)
++
++
++def cheapest_first(path):
++    items = load_items(path)
++    items.sort(key=lambda item: item["price"])
++    return items

@@ -1,0 +1,2024 @@
+{
+  "config": {
+    "label": "agent-v2",
+    "mode": "agent",
+    "agent_max_steps": 8,
+    "agent_max_tokens": 60000,
+    "model": "gpt-4o-mini",
+    "max_tokens_per_chunk": 6000,
+    "max_chunks": 5,
+    "max_comments": 10,
+    "tolerance": 3,
+    "runs": 3
+  },
+  "summary": {
+    "runs": 3,
+    "recall": 1.0,
+    "recall_with_notes": 1.0,
+    "recall_per_run": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "strict_precision": 1.0,
+    "false_positives_per_clean_pr": 0.7777777777777778,
+    "notes_per_clean_pr": 0.0,
+    "notes_per_review": 0.0,
+    "validity": 1.0,
+    "recall_by_category": {
+      "bug": 1.0,
+      "performance": 1.0,
+      "security": 1.0
+    },
+    "failed_chunks": 0,
+    "avg_cost_usd_per_review": 0.001152659375,
+    "avg_seconds_per_review": 4.831963692733552,
+    "total_cost_usd": 0.05532765,
+    "agent": {
+      "agent_finished_rate": 0.9375,
+      "avg_steps": 4.354166666666667,
+      "avg_tool_calls": 4.916666666666667,
+      "used_tools_rate": 0.9375,
+      "fallbacks": {
+        "diff_too_large": 3
+      },
+      "avg_filtered": 0.0
+    }
+  },
+  "scores": [
+    {
+      "case_id": "bug_off_by_one",
+      "run": 1,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 11829,
+      "completion_tokens": 234,
+      "seconds": 7.785285416059196,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/pagination.py",
+          "line": 12,
+          "severity": "bug",
+          "message": "The range in the for loop should include the last page. Change 'range(1, total)' to 'range(1, total + 1)' to ensure all pages are processed.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 8,
+      "agent_tool_calls": 7,
+      "agent_fallback": null,
+      "agent_trace": [
+        "read_file({\"path\":\"app/pagination.py\"})",
+        "search_code({\"query\":\"page_count\"})",
+        "search_code({\"query\":\"get_pages\"})",
+        "read_file({\"path\":\"app/pagination.py\",\"start_line\":1,\"end_line\":3})",
+        "read_file({\"path\":\"app/pagination.py\",\"start_line\":16})",
+        "read_file({\"path\":\"app/pagination.py\",\"start_line\":1})",
+        "read_file({\"path\":\"app/pagination.py\",\"start_line\":4,\"end_line\":8})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "bug_mutable_default",
+      "run": 1,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 2152,
+      "completion_tokens": 158,
+      "seconds": 3.4892943331506103,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/cart.py",
+          "line": 1,
+          "severity": "bug",
+          "message": "The default mutable argument 'cart' can lead to unexpected behavior. If the function is called multiple times without providing a cart, it will keep adding items to the same list. Instead, use 'None' as the default value and create a new list inside the function if 'cart' is None.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 2,
+      "agent_fallback": null,
+      "agent_trace": [
+        "search_code({\"query\": \"add_item\"})",
+        "read_file({\"path\": \"app/cart.py\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "bug_swallowed_exception",
+      "run": 1,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 2345,
+      "completion_tokens": 135,
+      "seconds": 2.652033916907385,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/payments.py",
+          "line": 11,
+          "severity": "bug",
+          "message": "Catching all exceptions without handling them can lead to silent failures and make debugging difficult. It's better to catch specific exceptions or at least log the exception to understand what went wrong.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 2,
+      "agent_fallback": null,
+      "agent_trace": [
+        "search_code({\"query\": \"charge\"})",
+        "read_file({\"path\": \"app/payments.py\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "bug_unclosed_file",
+      "run": 1,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 10989,
+      "completion_tokens": 239,
+      "seconds": 8.396356999874115,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/config_loader.py",
+          "line": 7,
+          "severity": "bug",
+          "message": "The file is opened without a context manager, which can lead to resource leaks if an exception occurs. Use 'with open(path) as f:' to ensure the file is properly closed after use.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 8,
+      "agent_tool_calls": 8,
+      "agent_fallback": null,
+      "agent_trace": [
+        "read_file({\"path\":\"app/config_loader.py\"})",
+        "search_code({\"query\": \"load_config\"})",
+        "read_file({\"path\": \"app/config_loader.py\"}) [duplicate]",
+        "read_file({\"path\":\"app/config_loader.py\"}) [duplicate]",
+        "search_code({\"query\":\"json.load\"})",
+        "read_file({\"path\":\"app/config_loader.py\"}) [duplicate]",
+        "read_file({\"path\":\"app/config_loader.py\"}) [duplicate]",
+        "read_file({\"path\":\"app/config_loader.py\"}) [duplicate]"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "bug_none_access",
+      "run": 1,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 2276,
+      "completion_tokens": 143,
+      "seconds": 2.6683420829940587,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/users.py",
+          "line": 9,
+          "severity": "bug",
+          "message": "This code will raise a KeyError if the user_id does not exist in the USERS dictionary. You should add a check to handle cases where the user is not found, for example by returning None or raising a custom exception.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 2,
+      "agent_fallback": null,
+      "agent_trace": [
+        "read_file({\"path\": \"app/users.py\"})",
+        "search_code({\"query\": \"get_email\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "bug_is_comparison",
+      "run": 1,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 2194,
+      "completion_tokens": 119,
+      "seconds": 2.3467907081358135,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/status.py",
+          "line": 6,
+          "severity": "bug",
+          "message": "Using 'is' for string comparison can lead to unexpected behavior. Use '==' instead for comparing strings.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 2,
+      "agent_fallback": null,
+      "agent_trace": [
+        "read_file({\"path\": \"app/status.py\"})",
+        "search_code({\"query\": \"can_login\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "sec_sql_injection",
+      "run": 1,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 2265,
+      "completion_tokens": 160,
+      "seconds": 3.0788584579713643,
+      "is_clean": false,
+      "hit_categories": [
+        "security"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/db.py",
+          "line": 10,
+          "severity": "security",
+          "message": "The SQL query is vulnerable to SQL injection because it directly interpolates the 'name' variable into the SQL string. Use parameterized queries instead to prevent this vulnerability. For example, change the execute line to: cursor.execute('SELECT id, name, email FROM users WHERE name = ?', (name,))",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 2,
+      "agent_fallback": null,
+      "agent_trace": [
+        "search_code({\"query\": \"find_user\"})",
+        "read_file({\"path\": \"app/db.py\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "sec_hardcoded_key",
+      "run": 1,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 2371,
+      "completion_tokens": 121,
+      "seconds": 2.2485553750302643,
+      "is_clean": false,
+      "hit_categories": [
+        "security"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/weather.py",
+          "line": 4,
+          "severity": "security",
+          "message": "Hardcoded API key is a security risk. Consider using environment variables or a secure vault to manage sensitive information.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 2,
+      "agent_fallback": null,
+      "agent_trace": [
+        "search_code({\"query\": \"API_KEY\"})",
+        "search_code({\"query\": \"current\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "sec_shell_injection",
+      "run": 1,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 11364,
+      "completion_tokens": 243,
+      "seconds": 7.317692749900743,
+      "is_clean": false,
+      "hit_categories": [
+        "security"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/tools.py",
+          "line": 6,
+          "severity": "security",
+          "message": "Using 'shell=True' in subprocess.run can lead to shell injection vulnerabilities if 'host' is not properly sanitized. It is recommended to avoid 'shell=True' and pass the command as a list instead, e.g., ['ping', '-c', '1', host].",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 8,
+      "agent_tool_calls": 8,
+      "agent_fallback": null,
+      "agent_trace": [
+        "read_file({\"path\":\"app/tools.py\"})",
+        "search_code({\"query\": \"ping\"})",
+        "search_code({\"query\": \"subprocess\"})",
+        "search_code({\"query\":\"subprocess.run\"})",
+        "search_code({\"query\":\"shell=True\"})",
+        "search_code({\"query\":\"capture_output=True\"})",
+        "search_code({\"query\":\"result.returncode\"})",
+        "search_code({\"query\":\"result\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "perf_n_plus_one",
+      "run": 1,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 12199,
+      "completion_tokens": 463,
+      "seconds": 9.727518667001277,
+      "is_clean": false,
+      "hit_categories": [
+        "performance"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/reports.py",
+          "line": 4,
+          "severity": "bug",
+          "message": "The change from using 'db.get_customers' to 'db.get_customer' means that the code now retrieves a single customer instead of a collection of customers. This will lead to a KeyError if the customer_id does not exist in the database, as it assumes the customer will always be found. To fix this, ensure that 'db.get_customer' handles cases where the customer is not found, possibly by returning None or raising a custom exception.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 8,
+      "agent_tool_calls": 14,
+      "agent_fallback": null,
+      "agent_trace": [
+        "read_file({\"path\": \"app/reports.py\"})",
+        "search_code({\"query\": \"get_customers\"})",
+        "search_code({\"query\": \"get_customer\"})",
+        "search_code({\"query\": \"order_summary\"})",
+        "read_file({\"path\": \"app/db.py\"})",
+        "read_file({\"path\": \"app/models.py\"})",
+        "search_code({\"query\": \"db\"})",
+        "search_code({\"query\": \"orders\"})",
+        "search_code({\"query\": \"customer_id\"})",
+        "search_code({\"query\": \"total\"})",
+        "search_code({\"query\": \"customer\"})",
+        "search_code({\"query\": \"name\"})",
+        "search_code({\"query\": \"orders\"}) [duplicate]",
+        "search_code({\"query\": \"get_customer\"}) [duplicate]"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "perf_list_membership",
+      "run": 1,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 6300,
+      "completion_tokens": 172,
+      "seconds": 4.561119084013626,
+      "is_clean": false,
+      "hit_categories": [
+        "performance"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/dedupe.py",
+          "line": 10,
+          "severity": "performance",
+          "message": "The current implementation of unique_emails uses a list to track seen emails, which results in O(n^2) time complexity due to the 'if e not in seen' check. Consider using a set for 'seen' to improve performance to O(n).",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 5,
+      "agent_tool_calls": 4,
+      "agent_fallback": null,
+      "agent_trace": [
+        "read_file({\"path\":\"app/dedupe.py\"})",
+        "search_code({\"query\":\"unique_emails\"})",
+        "search_code({\"query\":\"normalize\"})",
+        "read_file({\"path\":\"app/dedupe.py\"}) [duplicate]"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "clean_rename",
+      "run": 1,
+      "expected_total": 0,
+      "expected_hit": 0,
+      "comments_total": 1,
+      "comments_correct": 0,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 2101,
+      "completion_tokens": 110,
+      "seconds": 2.3564683340955526,
+      "is_clean": true,
+      "hit_categories": [],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/stats.py",
+          "line": 2,
+          "severity": "bug",
+          "message": "Returning 0.0 for an empty input list may lead to misleading results when calculating the mean. It would be better to raise a ValueError to indicate that the mean cannot be calculated for an empty list.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 1,
+      "agent_fallback": null,
+      "agent_trace": [
+        "read_file({\"path\":\"app/stats.py\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "clean_docstring",
+      "run": 1,
+      "expected_total": 0,
+      "expected_hit": 0,
+      "comments_total": 0,
+      "comments_correct": 0,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 2225,
+      "completion_tokens": 45,
+      "seconds": 1.5338708751369268,
+      "is_clean": true,
+      "hit_categories": [],
+      "missed_categories": [],
+      "comments": [],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 1,
+      "agent_fallback": null,
+      "agent_trace": [
+        "read_file({\"path\":\"app/money.py\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "clean_add_test",
+      "run": 1,
+      "expected_total": 0,
+      "expected_hit": 0,
+      "comments_total": 1,
+      "comments_correct": 0,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 4992,
+      "completion_tokens": 219,
+      "seconds": 4.404737082775682,
+      "is_clean": true,
+      "hit_categories": [],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "tests/test_money.py",
+          "line": 5,
+          "severity": "bug",
+          "message": "The test for whole dollars (3) expects 300, which is correct. However, the test for fractions (2.5) expects 250, which is incorrect because the function rounds the result. The expected value should be 250, but the rounding behavior of the function could lead to unexpected results for other fractions. Consider adding more tests for edge cases and clarify the expected behavior in the function documentation.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 4,
+      "agent_tool_calls": 4,
+      "agent_fallback": null,
+      "agent_trace": [
+        "read_file({\"path\":\"app/money.py\"})",
+        "search_code({\"query\": \"to_cents\"})",
+        "read_file({\"path\": \"tests/test_money.py\"})",
+        "read_file({\"path\":\"app/money.py\"}) [duplicate]"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "hard_cross_file",
+      "run": 1,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 14299,
+      "completion_tokens": 451,
+      "seconds": 9.012031416874379,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/api.py",
+          "line": 5,
+          "severity": "bug",
+          "message": "The 'signup' function calls 'create_user' with a hardcoded role of 'member'. If the role is not intended to be hardcoded, this could lead to incorrect user role assignments. Ensure that the role is intended to be 'member' or consider making it configurable.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 8,
+      "agent_tool_calls": 15,
+      "agent_fallback": null,
+      "agent_trace": [
+        "search_code({\"query\": \"create_user\"})",
+        "read_file({\"path\": \"app/services.py\"})",
+        "search_code({\"query\": \"signup\"})",
+        "search_code({\"query\": \"invite\"})",
+        "search_code({\"query\": \"USERS\"})",
+        "search_code({\"query\": \"role\"})",
+        "read_file({\"path\": \"app/api.py\"})",
+        "read_file({\"path\": \"app/services.py\"}) [duplicate]",
+        "search_code({\"query\": \"request\"})",
+        "search_code({\"query\": \"name\"})",
+        "search_code({\"query\": \"email\"})",
+        "search_code({\"query\": \"request[\\\"name\\\"]\"})",
+        "search_code({\"query\": \"request[\\\"email\\\"]\"})",
+        "search_code({\"query\": \"\\\"member\\\"\"})",
+        "search_code({\"query\": \"\\\"role\\\"\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "hard_late_hunk",
+      "run": 1,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 12898,
+      "completion_tokens": 162,
+      "seconds": 2.561809124890715,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/metrics.py",
+          "line": 1404,
+          "severity": "bug",
+          "message": "The last_value function incorrectly calculates the index as the length of the list, which will result in an IndexError. Change 'index = len(values)' to 'index = len(values) - 1' to correctly access the last element.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": "diff_too_large",
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "bug_off_by_one",
+      "run": 2,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 11565,
+      "completion_tokens": 197,
+      "seconds": 7.476728874957189,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/pagination.py",
+          "line": 12,
+          "severity": "bug",
+          "message": "The range in the for loop should include the last page. Change 'range(1, total)' to 'range(1, total + 1)' to ensure all pages are processed.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 8,
+      "agent_tool_calls": 7,
+      "agent_fallback": null,
+      "agent_trace": [
+        "read_file({\"path\":\"app/pagination.py\"})",
+        "search_code({\"query\":\"page_count\"})",
+        "search_code({\"query\":\"get_pages\"})",
+        "read_file({\"path\":\"app/pagination.py\"}) [duplicate]",
+        "read_file({\"path\":\"app/pagination.py\"}) [duplicate]",
+        "search_code({\"query\":\"math.ceil\"})",
+        "search_code({\"query\":\"len\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "bug_mutable_default",
+      "run": 2,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 2093,
+      "completion_tokens": 122,
+      "seconds": 2.348996332846582,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/cart.py",
+          "line": 1,
+          "severity": "bug",
+          "message": "Using a mutable default argument (cart=[]) can lead to unexpected behavior, as the same list will be used across multiple calls to add_item if no cart is provided. Instead, use None as the default value and create a new list inside the function if cart is None.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 1,
+      "agent_fallback": null,
+      "agent_trace": [
+        "read_file({\"path\":\"app/cart.py\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "bug_swallowed_exception",
+      "run": 2,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 2345,
+      "completion_tokens": 151,
+      "seconds": 2.340926874894649,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/payments.py",
+          "line": 11,
+          "severity": "bug",
+          "message": "Catching all exceptions without handling them can hide errors and make debugging difficult. It's better to catch specific exceptions or at least log the exception message. Consider changing 'except:' to 'except Exception as e:' and log the exception using logger.error(e).",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 2,
+      "agent_fallback": null,
+      "agent_trace": [
+        "search_code({\"query\": \"charge\"})",
+        "read_file({\"path\": \"app/payments.py\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "bug_unclosed_file",
+      "run": 2,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 9478,
+      "completion_tokens": 238,
+      "seconds": 6.264463500119746,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/config_loader.py",
+          "line": 7,
+          "severity": "bug",
+          "message": "The file is opened but not closed, which can lead to resource leaks. Use a context manager (with statement) to ensure the file is properly closed after reading.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 7,
+      "agent_tool_calls": 7,
+      "agent_fallback": null,
+      "agent_trace": [
+        "read_file({\"path\":\"app/config_loader.py\"})",
+        "search_code({\"query\": \"load_config\"})",
+        "read_file({\"path\": \"app/config_loader.py\", \"start_line\": 6, \"end_line\": 9})",
+        "read_file({\"path\":\"app/config_loader.py\",\"start_line\":1,\"end_line\":5})",
+        "read_file({\"path\":\"app/config_loader.py\",\"start_line\":10})",
+        "search_code({\"query\":\"open\"})",
+        "search_code({\"query\":\"json.load\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "bug_none_access",
+      "run": 2,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 11760,
+      "completion_tokens": 300,
+      "seconds": 7.5789462078828365,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/users.py",
+          "line": 9,
+          "severity": "bug",
+          "message": "If the user_id does not exist in USERS, the code will raise a KeyError when trying to access user['email']. You should add a check to ensure that user is not None before attempting to access its properties.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 8,
+      "agent_tool_calls": 9,
+      "agent_fallback": null,
+      "agent_trace": [
+        "read_file({\"path\":\"app/users.py\"})",
+        "search_code({\"query\": \"get_email\"})",
+        "search_code({\"query\": \"USERS\"})",
+        "read_file({\"path\":\"app/users.py\",\"start_line\":1,\"end_line\":4})",
+        "read_file({\"path\":\"app/users.py\",\"start_line\":5})",
+        "search_code({\"query\": \"user\"})",
+        "search_code({\"query\": \"lower\"})",
+        "read_file({\"path\":\"app/users.py\",\"start_line\":1,\"end_line\":9})",
+        "read_file({\"path\":\"app/users.py\",\"start_line\":1,\"end_line\":4}) [duplicate]"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "bug_is_comparison",
+      "run": 2,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 2194,
+      "completion_tokens": 124,
+      "seconds": 2.4546225420199335,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/status.py",
+          "line": 6,
+          "severity": "bug",
+          "message": "Using 'is' for string comparison is incorrect. Use '==' instead to compare the value of account.status with 'active'.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 2,
+      "agent_fallback": null,
+      "agent_trace": [
+        "read_file({\"path\": \"app/status.py\"})",
+        "search_code({\"query\": \"can_login\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "sec_sql_injection",
+      "run": 2,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 2265,
+      "completion_tokens": 130,
+      "seconds": 2.155362332938239,
+      "is_clean": false,
+      "hit_categories": [
+        "security"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/db.py",
+          "line": 10,
+          "severity": "security",
+          "message": "The SQL query is vulnerable to SQL injection because it directly interpolates the 'name' variable into the SQL string. Use parameterized queries to prevent this issue.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 2,
+      "agent_fallback": null,
+      "agent_trace": [
+        "search_code({\"query\": \"find_user\"})",
+        "read_file({\"path\": \"app/db.py\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "sec_hardcoded_key",
+      "run": 2,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 2371,
+      "completion_tokens": 149,
+      "seconds": 2.3862475419882685,
+      "is_clean": false,
+      "hit_categories": [
+        "security"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/weather.py",
+          "line": 4,
+          "severity": "security",
+          "message": "The API key is hardcoded in the source code, which can lead to security vulnerabilities if the code is exposed. It is recommended to store sensitive information like API keys in environment variables or a secure vault instead of hardcoding them in the source code.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 2,
+      "agent_fallback": null,
+      "agent_trace": [
+        "search_code({\"query\": \"API_KEY\"})",
+        "search_code({\"query\": \"current\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "sec_shell_injection",
+      "run": 2,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 11602,
+      "completion_tokens": 257,
+      "seconds": 7.439999291906133,
+      "is_clean": false,
+      "hit_categories": [
+        "security"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/tools.py",
+          "line": 6,
+          "severity": "security",
+          "message": "Using 'shell=True' in subprocess.run can lead to shell injection vulnerabilities if 'host' is not properly sanitized. Consider using a list for the command and avoid shell=True to mitigate this risk.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 8,
+      "agent_tool_calls": 9,
+      "agent_fallback": null,
+      "agent_trace": [
+        "read_file({\"path\":\"app/tools.py\"})",
+        "search_code({\"query\": \"ping\"})",
+        "search_code({\"query\": \"subprocess\"})",
+        "search_code({\"query\":\"subprocess.run\"})",
+        "search_code({\"query\": \"shell=True\"})",
+        "search_code({\"query\": \"capture_output=True\"})",
+        "search_code({\"query\":\"ping\"}) [duplicate]",
+        "search_code({\"query\":\"result.returncode\"})",
+        "search_code({\"query\":\"def ping\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "perf_n_plus_one",
+      "run": 2,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 12861,
+      "completion_tokens": 495,
+      "seconds": 8.906129708979279,
+      "is_clean": false,
+      "hit_categories": [
+        "performance"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/reports.py",
+          "line": 4,
+          "severity": "bug",
+          "message": "The change from using db.get_customers to db.get_customer may lead to performance issues if the number of orders is large, as it now queries the database for each individual customer instead of fetching all customers in one go. Consider reverting to the previous implementation or optimizing the new approach to minimize database calls.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 8,
+      "agent_tool_calls": 14,
+      "agent_fallback": null,
+      "agent_trace": [
+        "read_file({\"path\": \"app/reports.py\"})",
+        "search_code({\"query\": \"get_customers\"})",
+        "search_code({\"query\": \"get_customer\"})",
+        "read_file({\"path\": \"app/reports.py\", \"start_line\": 1, \"end_line\": 6})",
+        "read_file({\"path\": \"app/reports.py\", \"start_line\": 1, \"end_line\": 6}) [duplicate]",
+        "search_code({\"query\": \"db\"})",
+        "search_code({\"query\": \"order_summary\"})",
+        "search_code({\"query\": \"orders\"})",
+        "read_file({\"path\": \"app/reports.py\", \"start_line\": 1, \"end_line\": 6}) [duplicate]",
+        "search_code({\"query\": \"customer_id\"})",
+        "read_file({\"path\": \"app/reports.py\", \"start_line\": 1, \"end_line\": 6}) [duplicate]",
+        "search_code({\"query\": \"db.get_customer\"})",
+        "read_file({\"path\": \"app/reports.py\", \"start_line\": 1, \"end_line\": 6}) [duplicate]",
+        "search_code({\"query\": \"customer\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "perf_list_membership",
+      "run": 2,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 11111,
+      "completion_tokens": 206,
+      "seconds": 6.881703583989292,
+      "is_clean": false,
+      "hit_categories": [
+        "performance"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/dedupe.py",
+          "line": 10,
+          "severity": "performance",
+          "message": "The current implementation of unique_emails uses a list to track seen emails, which results in O(n^2) time complexity due to the 'if e not in seen' check. Consider using a set to improve performance to O(n).",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 8,
+      "agent_tool_calls": 7,
+      "agent_fallback": null,
+      "agent_trace": [
+        "read_file({\"path\":\"app/dedupe.py\"})",
+        "search_code({\"query\":\"unique_emails\"})",
+        "search_code({\"query\":\"normalize\"})",
+        "search_code({\"query\":\"seen\"})",
+        "search_code({\"query\":\"emails\"})",
+        "search_code({\"query\":\"strip\"})",
+        "search_code({\"query\":\"lower\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "clean_rename",
+      "run": 2,
+      "expected_total": 0,
+      "expected_hit": 0,
+      "comments_total": 1,
+      "comments_correct": 0,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 2101,
+      "completion_tokens": 109,
+      "seconds": 2.2397809580434114,
+      "is_clean": true,
+      "hit_categories": [],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/stats.py",
+          "line": 2,
+          "severity": "bug",
+          "message": "Returning 0.0 for an empty input list may lead to misleading results when calculating the mean. It is better to raise a ValueError to indicate that the mean cannot be computed for an empty list.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 1,
+      "agent_fallback": null,
+      "agent_trace": [
+        "read_file({\"path\":\"app/stats.py\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "clean_docstring",
+      "run": 2,
+      "expected_total": 0,
+      "expected_hit": 0,
+      "comments_total": 0,
+      "comments_correct": 0,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 2326,
+      "completion_tokens": 89,
+      "seconds": 1.7853218750096858,
+      "is_clean": true,
+      "hit_categories": [],
+      "missed_categories": [],
+      "comments": [],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 3,
+      "agent_fallback": null,
+      "agent_trace": [
+        "read_file({\"path\": \"app/money.py\"})",
+        "search_code({\"query\": \"to_cents\"})",
+        "search_code({\"query\": \"format_cents\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "clean_add_test",
+      "run": 2,
+      "expected_total": 0,
+      "expected_hit": 0,
+      "comments_total": 1,
+      "comments_correct": 0,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 7838,
+      "completion_tokens": 243,
+      "seconds": 5.992007208056748,
+      "is_clean": true,
+      "hit_categories": [],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "tests/test_money.py",
+          "line": 5,
+          "severity": "bug",
+          "message": "The function to_cents does not handle fractions correctly due to the use of round, which can lead to unexpected results for certain decimal values. For example, to_cents(2.675) would return 267 instead of the expected 268. Consider using a different approach for rounding or handling decimal values.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 6,
+      "agent_tool_calls": 6,
+      "agent_fallback": null,
+      "agent_trace": [
+        "search_code({\"query\":\"to_cents\"})",
+        "read_file({\"path\":\"app/money.py\"})",
+        "search_code({\"query\": \"round\"})",
+        "search_code({\"query\": \"def test_to_cents_handles_fractions\"})",
+        "search_code({\"query\":\"def test_to_cents_whole_dollars\"})",
+        "search_code({\"query\":\"def test_to_cents_handles_fractions\"}) [duplicate]"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "hard_cross_file",
+      "run": 2,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 14109,
+      "completion_tokens": 415,
+      "seconds": 9.218575249891728,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/api.py",
+          "line": 5,
+          "severity": "bug",
+          "message": "The 'signup' function does not handle cases where 'request' may not contain 'name' or 'email', which could lead to KeyError. Consider adding validation to ensure these keys exist before accessing them.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 8,
+      "agent_tool_calls": 14,
+      "agent_fallback": null,
+      "agent_trace": [
+        "search_code({\"query\": \"create_user\"})",
+        "read_file({\"path\": \"app/api.py\"})",
+        "read_file({\"path\": \"app/services.py\"})",
+        "search_code({\"query\": \"signup\"})",
+        "search_code({\"query\": \"invite\"})",
+        "search_code({\"query\": \"USERS\"})",
+        "read_file({\"path\": \"app/api.py\"}) [duplicate]",
+        "read_file({\"path\": \"app/services.py\"}) [duplicate]",
+        "search_code({\"query\": \"request\"})",
+        "search_code({\"query\": \"role\"})",
+        "search_code({\"query\": \"name\"})",
+        "search_code({\"query\": \"email\"})",
+        "search_code({\"query\": \"create_user\"}) [duplicate]",
+        "search_code({\"query\": \"USERS\"}) [duplicate]"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "hard_late_hunk",
+      "run": 2,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 12898,
+      "completion_tokens": 157,
+      "seconds": 2.8663150838110596,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/metrics.py",
+          "line": 1404,
+          "severity": "bug",
+          "message": "The calculation of 'index' is incorrect. It should be 'index = len(values) - 1' to get the last valid index of the list. Otherwise, it will raise an IndexError if 'values' is not empty.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": "diff_too_large",
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "bug_off_by_one",
+      "run": 3,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 11613,
+      "completion_tokens": 203,
+      "seconds": 8.45850283303298,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/pagination.py",
+          "line": 12,
+          "severity": "bug",
+          "message": "The range in the for loop should include 'total' to account for the last page. Change 'range(1, total)' to 'range(1, total + 1)'.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 8,
+      "agent_tool_calls": 7,
+      "agent_fallback": null,
+      "agent_trace": [
+        "read_file({\"path\":\"app/pagination.py\"})",
+        "search_code({\"query\":\"page_count\"})",
+        "search_code({\"query\":\"get_pages\"})",
+        "read_file({\"path\":\"app/pagination.py\"}) [duplicate]",
+        "read_file({\"path\":\"app/pagination.py\"}) [duplicate]",
+        "read_file({\"path\":\"app/pagination.py\"}) [duplicate]",
+        "read_file({\"path\":\"app/pagination.py\"}) [duplicate]"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "bug_mutable_default",
+      "run": 3,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 2093,
+      "completion_tokens": 117,
+      "seconds": 2.0885274580214173,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/cart.py",
+          "line": 1,
+          "severity": "bug",
+          "message": "Using a mutable default argument (cart=[]) can lead to unexpected behavior, as the same list will be used across multiple calls to add_item. Instead, use None as the default value and create a new list inside the function if cart is None.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 1,
+      "agent_fallback": null,
+      "agent_trace": [
+        "read_file({\"path\":\"app/cart.py\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "bug_swallowed_exception",
+      "run": 3,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 2345,
+      "completion_tokens": 157,
+      "seconds": 2.5581978331319988,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/payments.py",
+          "line": 11,
+          "severity": "bug",
+          "message": "Catching all exceptions without handling them can hide errors and make debugging difficult. It's better to catch specific exceptions or at least log the exception message. Modify the except clause to log the exception: `except Exception as e: logger.error('Error charging order: %s', e)`",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 2,
+      "agent_fallback": null,
+      "agent_trace": [
+        "search_code({\"query\": \"charge\"})",
+        "read_file({\"path\": \"app/payments.py\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "bug_unclosed_file",
+      "run": 3,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 10949,
+      "completion_tokens": 238,
+      "seconds": 8.60098100011237,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/config_loader.py",
+          "line": 7,
+          "severity": "bug",
+          "message": "The file is opened without using a context manager, which can lead to resource leaks if an exception occurs. Use 'with open(path) as f:' instead to ensure the file is properly closed after its suite finishes.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 8,
+      "agent_tool_calls": 8,
+      "agent_fallback": null,
+      "agent_trace": [
+        "read_file({\"path\":\"app/config_loader.py\"})",
+        "search_code({\"query\": \"load_config\"})",
+        "read_file({\"path\": \"app/config_loader.py\"}) [duplicate]",
+        "read_file({\"path\":\"app/config_loader.py\"}) [duplicate]",
+        "search_code({\"query\":\"open\"})",
+        "read_file({\"path\":\"app/config_loader.py\"}) [duplicate]",
+        "search_code({\"query\":\"json.load\"})",
+        "search_code({\"query\":\"DEFAULTS\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "bug_none_access",
+      "run": 3,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 11758,
+      "completion_tokens": 297,
+      "seconds": 7.684325041947886,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/users.py",
+          "line": 9,
+          "severity": "bug",
+          "message": "If the user_id does not exist in USERS, the code will raise a KeyError when trying to access user['email']. You should add a check to ensure user is not None before accessing its email.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 8,
+      "agent_tool_calls": 9,
+      "agent_fallback": null,
+      "agent_trace": [
+        "read_file({\"path\":\"app/users.py\"})",
+        "search_code({\"query\": \"get_email\"})",
+        "search_code({\"query\": \"USERS\"})",
+        "read_file({\"path\":\"app/users.py\",\"start_line\":1,\"end_line\":4})",
+        "read_file({\"path\":\"app/users.py\",\"start_line\":5})",
+        "search_code({\"query\": \"user\"})",
+        "search_code({\"query\": \"lower\"})",
+        "read_file({\"path\":\"app/users.py\",\"start_line\":1,\"end_line\":9})",
+        "read_file({\"path\":\"app/users.py\",\"start_line\":7,\"end_line\":9})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "bug_is_comparison",
+      "run": 3,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 12352,
+      "completion_tokens": 408,
+      "seconds": 8.805989667074755,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/status.py",
+          "line": 6,
+          "severity": "bug",
+          "message": "Using 'is' for string comparison is incorrect; use '==' instead. This will lead to unexpected behavior when checking if account.status is 'active'.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 8,
+      "agent_tool_calls": 14,
+      "agent_fallback": null,
+      "agent_trace": [
+        "read_file({\"path\": \"app/status.py\"})",
+        "search_code({\"query\": \"can_login\"})",
+        "search_code({\"query\": \"account.locked\"})",
+        "search_code({\"query\": \"account.status\"})",
+        "search_code({\"query\": \"account\"})",
+        "search_code({\"query\": \"status\"})",
+        "read_file({\"path\": \"app/status.py\"}) [duplicate]",
+        "search_code({\"query\": \"account.status\"}) [duplicate]",
+        "search_code({\"query\": \"account.locked\"}) [duplicate]",
+        "search_code({\"query\": \"def is_active\"})",
+        "search_code({\"query\": \"def can_login\"})",
+        "search_code({\"query\": \"account\"}) [duplicate]",
+        "search_code({\"query\": \"account.locked\"}) [duplicate]",
+        "search_code({\"query\": \"account.status\"}) [duplicate]"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "sec_sql_injection",
+      "run": 3,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 2265,
+      "completion_tokens": 131,
+      "seconds": 2.66234862501733,
+      "is_clean": false,
+      "hit_categories": [
+        "security"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/db.py",
+          "line": 10,
+          "severity": "security",
+          "message": "The SQL query is vulnerable to SQL injection because it directly interpolates the 'name' variable into the query string. Use parameterized queries instead to prevent this vulnerability.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 2,
+      "agent_fallback": null,
+      "agent_trace": [
+        "search_code({\"query\": \"find_user\"})",
+        "read_file({\"path\": \"app/db.py\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "sec_hardcoded_key",
+      "run": 3,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 2371,
+      "completion_tokens": 131,
+      "seconds": 2.624224500032142,
+      "is_clean": false,
+      "hit_categories": [
+        "security"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/weather.py",
+          "line": 4,
+          "severity": "security",
+          "message": "API_KEY is hardcoded in the source code, which poses a security risk. It is recommended to use environment variables or a secure vault to manage sensitive information like API keys.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 2,
+      "agent_fallback": null,
+      "agent_trace": [
+        "search_code({\"query\": \"API_KEY\"})",
+        "search_code({\"query\": \"current\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "sec_shell_injection",
+      "run": 3,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 2177,
+      "completion_tokens": 132,
+      "seconds": 2.5991573340725154,
+      "is_clean": false,
+      "hit_categories": [
+        "security"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/tools.py",
+          "line": 6,
+          "severity": "security",
+          "message": "Using `shell=True` with `subprocess.run` can lead to shell injection vulnerabilities if `host` is not properly sanitized. It's recommended to avoid `shell=True` and pass the command as a list instead, e.g., `subprocess.run(['ping', '-c', '1', host], capture_output=True)`.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 1,
+      "agent_fallback": null,
+      "agent_trace": [
+        "read_file({\"path\":\"app/tools.py\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "perf_n_plus_one",
+      "run": 3,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 12766,
+      "completion_tokens": 501,
+      "seconds": 11.03555270889774,
+      "is_clean": false,
+      "hit_categories": [
+        "performance"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/reports.py",
+          "line": 4,
+          "severity": "bug",
+          "message": "The change from using 'db.get_customers' to 'db.get_customer' may lead to incorrect behavior if 'db.get_customer' does not handle multiple customer IDs correctly. Ensure that 'db.get_customer' is designed to retrieve a single customer based on the provided customer_id. If it is not, this change will break the functionality of retrieving customer names for multiple orders.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 8,
+      "agent_tool_calls": 14,
+      "agent_fallback": null,
+      "agent_trace": [
+        "read_file({\"path\": \"app/reports.py\"})",
+        "search_code({\"query\": \"get_customers\"})",
+        "search_code({\"query\": \"get_customer\"})",
+        "read_file({\"path\": \"app/reports.py\", \"start_line\": 1, \"end_line\": 6})",
+        "search_code({\"query\": \"db.get_customer\"})",
+        "read_file({\"path\": \"app/reports.py\", \"start_line\": 1, \"end_line\": 6}) [duplicate]",
+        "search_code({\"query\": \"db.get_customers\"})",
+        "search_code({\"query\": \"db.get_customer\"}) [duplicate]",
+        "search_code({\"query\": \"customer_id\"})",
+        "search_code({\"query\": \"orders\"})",
+        "read_file({\"path\": \"app/reports.py\", \"start_line\": 1, \"end_line\": 6}) [duplicate]",
+        "search_code({\"query\": \"orders\"}) [duplicate]",
+        "read_file({\"path\": \"app/reports.py\", \"start_line\": 1, \"end_line\": 6}) [duplicate]",
+        "search_code({\"query\": \"db\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "perf_list_membership",
+      "run": 3,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 11157,
+      "completion_tokens": 214,
+      "seconds": 7.0869013329502195,
+      "is_clean": false,
+      "hit_categories": [
+        "performance"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/dedupe.py",
+          "line": 10,
+          "severity": "performance",
+          "message": "The current implementation of unique_emails uses a list to track seen emails, which results in O(n^2) time complexity due to the 'if e not in seen' check. Consider using a set for 'seen' to improve performance to O(n).",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 8,
+      "agent_tool_calls": 7,
+      "agent_fallback": null,
+      "agent_trace": [
+        "read_file({\"path\":\"app/dedupe.py\"})",
+        "search_code({\"query\":\"unique_emails\"})",
+        "search_code({\"query\":\"normalize\"})",
+        "search_code({\"query\":\"seen\"})",
+        "search_code({\"query\":\"emails\"})",
+        "search_code({\"query\":\"def \"})",
+        "read_file({\"path\":\"app/dedupe.py\"}) [duplicate]"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "clean_rename",
+      "run": 3,
+      "expected_total": 0,
+      "expected_hit": 0,
+      "comments_total": 1,
+      "comments_correct": 0,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 2101,
+      "completion_tokens": 118,
+      "seconds": 2.4030663329176605,
+      "is_clean": true,
+      "hit_categories": [],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/stats.py",
+          "line": 2,
+          "severity": "bug",
+          "message": "Returning 0.0 for an empty input list may lead to misleading results when calculating the mean. The mean of an empty list is undefined, and returning 0.0 could mislead users of this function. Consider raising a ValueError instead.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 1,
+      "agent_fallback": null,
+      "agent_trace": [
+        "read_file({\"path\":\"app/stats.py\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "clean_docstring",
+      "run": 3,
+      "expected_total": 0,
+      "expected_hit": 0,
+      "comments_total": 0,
+      "comments_correct": 0,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 2225,
+      "completion_tokens": 45,
+      "seconds": 1.530710499966517,
+      "is_clean": true,
+      "hit_categories": [],
+      "missed_categories": [],
+      "comments": [],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 1,
+      "agent_fallback": null,
+      "agent_trace": [
+        "read_file({\"path\":\"app/money.py\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "clean_add_test",
+      "run": 3,
+      "expected_total": 0,
+      "expected_hit": 0,
+      "comments_total": 2,
+      "comments_correct": 0,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 6340,
+      "completion_tokens": 255,
+      "seconds": 5.439004875021055,
+      "is_clean": true,
+      "hit_categories": [],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "tests/test_money.py",
+          "line": 5,
+          "severity": "bug",
+          "message": "The test for to_cents with whole dollars does not account for potential floating-point precision issues. It is better to use a tolerance when comparing floating-point numbers. Consider using pytest.approx for comparison.",
+          "kind": "inline"
+        },
+        {
+          "path": "tests/test_money.py",
+          "line": 9,
+          "severity": "bug",
+          "message": "The test for to_cents with fractions does not account for potential floating-point precision issues. It is better to use a tolerance when comparing floating-point numbers. Consider using pytest.approx for comparison.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 5,
+      "agent_tool_calls": 5,
+      "agent_fallback": null,
+      "agent_trace": [
+        "search_code({\"query\":\"to_cents\"})",
+        "read_file({\"path\":\"app/money.py\"})",
+        "search_code({\"query\": \"round\"})",
+        "search_code({\"query\": \"assert\"})",
+        "read_file({\"path\":\"app/money.py\"}) [duplicate]"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "hard_cross_file",
+      "run": 3,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 2477,
+      "completion_tokens": 153,
+      "seconds": 3.1163812919985503,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/api.py",
+          "line": 5,
+          "severity": "bug",
+          "message": "The 'signup' function now requires a 'role' argument for 'create_user', but it defaults to 'member' without validation. If 'role' is not intended to be hardcoded, consider making it configurable or validating it to prevent potential misuse.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 2,
+      "agent_fallback": null,
+      "agent_trace": [
+        "search_code({\"query\": \"create_user\"})",
+        "read_file({\"path\": \"app/services.py\"})"
+      ],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "hard_late_hunk",
+      "run": 3,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 12898,
+      "completion_tokens": 156,
+      "seconds": 2.7634941248688847,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/metrics.py",
+          "line": 1404,
+          "severity": "bug",
+          "message": "The calculation of 'index' is incorrect. It should be 'index = len(values) - 1' to get the last valid index of the list. Otherwise, this will raise an IndexError when the list is not empty.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": "diff_too_large",
+      "agent_trace": [],
+      "agent_filtered": 0
+    }
+  ]
+}

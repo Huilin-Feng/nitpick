@@ -10,7 +10,13 @@
           "category": "bug",
           "note": "range(1, total) skips the last page",
           "locations": [
-            {"path": "app/pagination.py", "lines": [12, 13]}
+            {
+              "path": "app/pagination.py",
+              "lines": [
+                12,
+                13
+              ]
+            }
           ]
         }
       ]
@@ -24,7 +30,13 @@
           "category": "bug",
           "note": "mutable default list is shared across calls",
           "locations": [
-            {"path": "app/cart.py", "lines": [1, 1]}
+            {
+              "path": "app/cart.py",
+              "lines": [
+                1,
+                1
+              ]
+            }
           ]
         }
       ]
@@ -38,7 +50,13 @@
           "category": "bug",
           "note": "bare except hides payment failures, then reports success",
           "locations": [
-            {"path": "app/payments.py", "lines": [11, 12]}
+            {
+              "path": "app/payments.py",
+              "lines": [
+                11,
+                12
+              ]
+            }
           ]
         }
       ]
@@ -52,7 +70,13 @@
           "category": "bug",
           "note": "file opened without a context manager is never closed",
           "locations": [
-            {"path": "app/config_loader.py", "lines": [7, 8]}
+            {
+              "path": "app/config_loader.py",
+              "lines": [
+                7,
+                8
+              ]
+            }
           ]
         }
       ]
@@ -66,7 +90,13 @@
           "category": "bug",
           "note": "USERS.get may return None, then subscripting fails",
           "locations": [
-            {"path": "app/users.py", "lines": [8, 9]}
+            {
+              "path": "app/users.py",
+              "lines": [
+                8,
+                9
+              ]
+            }
           ]
         }
       ]
@@ -80,7 +110,13 @@
           "category": "bug",
           "note": "'is' compares identity, not string equality",
           "locations": [
-            {"path": "app/status.py", "lines": [6, 6]}
+            {
+              "path": "app/status.py",
+              "lines": [
+                6,
+                6
+              ]
+            }
           ]
         }
       ]
@@ -94,7 +130,13 @@
           "category": "security",
           "note": "user input formatted into SQL",
           "locations": [
-            {"path": "app/db.py", "lines": [10, 10]}
+            {
+              "path": "app/db.py",
+              "lines": [
+                10,
+                10
+              ]
+            }
           ]
         }
       ]
@@ -108,7 +150,13 @@
           "category": "security",
           "note": "API key committed in source code",
           "locations": [
-            {"path": "app/weather.py", "lines": [4, 4]}
+            {
+              "path": "app/weather.py",
+              "lines": [
+                4,
+                4
+              ]
+            }
           ]
         }
       ]
@@ -122,7 +170,13 @@
           "category": "security",
           "note": "request data passed to a shell command",
           "locations": [
-            {"path": "app/tools.py", "lines": [6, 6]}
+            {
+              "path": "app/tools.py",
+              "lines": [
+                6,
+                6
+              ]
+            }
           ]
         }
       ]
@@ -136,7 +190,13 @@
           "category": "performance",
           "note": "one database query per order instead of one batch query",
           "locations": [
-            {"path": "app/reports.py", "lines": [3, 4]}
+            {
+              "path": "app/reports.py",
+              "lines": [
+                3,
+                4
+              ]
+            }
           ]
         }
       ]
@@ -150,7 +210,13 @@
           "category": "performance",
           "note": "membership test on a list makes this O(n^2); use a set",
           "locations": [
-            {"path": "app/dedupe.py", "lines": [7, 11]}
+            {
+              "path": "app/dedupe.py",
+              "lines": [
+                7,
+                11
+              ]
+            }
           ]
         }
       ]
@@ -182,8 +248,20 @@
           "category": "bug",
           "note": "invite() calls create_user without the new required role argument",
           "locations": [
-            {"path": "app/api.py", "lines": [8, 9]},
-            {"path": "app/services.py", "lines": [4, 4]}
+            {
+              "path": "app/api.py",
+              "lines": [
+                8,
+                9
+              ]
+            },
+            {
+              "path": "app/services.py",
+              "lines": [
+                4,
+                4
+              ]
+            }
           ]
         }
       ]
@@ -197,10 +275,88 @@
           "category": "bug",
           "note": "values[len(values)] raises IndexError",
           "locations": [
-            {"path": "app/metrics.py", "lines": [1403, 1404]}
+            {
+              "path": "app/metrics.py",
+              "lines": [
+                1403,
+                1404
+              ]
+            }
           ]
         }
       ]
+    },
+    {
+      "id": "ctx_units_stale_caller",
+      "description": "Discount changes from percent to fraction; the caller in checkout.py (not in the diff) still passes 10.",
+      "diff": "diffs/ctx_units_stale_caller.diff",
+      "expected": [
+        {
+          "category": "bug",
+          "note": "checkout.member_total still passes MEMBER_DISCOUNT = 10 (percent), which now raises ValueError",
+          "locations": [
+            {
+              "path": "app/pricing.py",
+              "lines": [
+                2,
+                5
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ctx_rename_stale_import",
+      "description": "format_date renamed to format_day; report.py (not in the diff) still imports format_date.",
+      "diff": "diffs/ctx_rename_stale_import.diff",
+      "expected": [
+        {
+          "category": "bug",
+          "note": "report.py imports format_date, which no longer exists (ImportError)",
+          "locations": [
+            {
+              "path": "app/formatting.py",
+              "lines": [
+                4,
+                4
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ctx_shared_cache_mutation",
+      "description": "New helper sorts the list returned by load_items, which is the shared cache (defined outside the diff).",
+      "diff": "diffs/ctx_shared_cache_mutation.diff",
+      "expected": [
+        {
+          "category": "bug",
+          "note": "items.sort() mutates the cached list in place, changing what every other caller of load_items sees",
+          "locations": [
+            {
+              "path": "app/catalog.py",
+              "lines": [
+                9,
+                10
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ctx_rename_all_updated",
+      "description": "Private helper renamed; its only use is updated in the same diff, and no other file uses it.",
+      "diff": "diffs/ctx_rename_all_updated.diff",
+      "expected": []
+    },
+    {
+      "id": "ctx_key_has_default",
+      "description": "Reads config['timeout']; settings.py (not in the diff) guarantees the key is always present.",
+      "diff": "diffs/ctx_key_has_default.diff",
+      "expected": []
     }
   ]
 }

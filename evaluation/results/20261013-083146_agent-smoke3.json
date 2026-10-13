@@ -1,0 +1,522 @@
+{
+  "config": {
+    "label": "agent-smoke3",
+    "mode": "agent",
+    "agent_max_steps": 8,
+    "agent_max_tokens": 60000,
+    "model": "gpt-4o-mini",
+    "max_tokens_per_chunk": 6000,
+    "max_chunks": 5,
+    "max_comments": 10,
+    "tolerance": 3,
+    "runs": 3
+  },
+  "summary": {
+    "runs": 3,
+    "recall": 1.0,
+    "recall_with_notes": 1.0,
+    "recall_per_run": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "strict_precision": 1.0,
+    "false_positives_per_clean_pr": 1.6666666666666667,
+    "notes_per_clean_pr": 0.0,
+    "notes_per_review": 0.0,
+    "validity": 1.0,
+    "recall_by_category": {
+      "bug": 1.0
+    },
+    "failed_chunks": 0,
+    "avg_cost_usd_per_review": 0.00038175,
+    "avg_seconds_per_review": 2.801160697825253,
+    "total_cost_usd": 0.004581,
+    "agent": {
+      "agent_finished_rate": 1.0,
+      "avg_steps": 2.0,
+      "avg_tool_calls": 1.75,
+      "used_tools_rate": 1.0,
+      "fallbacks": {}
+    }
+  },
+  "scores": [
+    {
+      "case_id": "clean_rename",
+      "run": 1,
+      "expected_total": 0,
+      "expected_hit": 0,
+      "comments_total": 1,
+      "comments_correct": 0,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 1845,
+      "completion_tokens": 146,
+      "seconds": 2.588400000007823,
+      "is_clean": true,
+      "hit_categories": [],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/stats.py",
+          "line": 2,
+          "severity": "bug",
+          "message": "The mean function now returns 0.0 for an empty input list, which changes its behavior from the previous implementation that did not handle empty lists and would raise a ZeroDivisionError. This change should be documented or handled differently to maintain consistency with expected behavior.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 2,
+      "agent_fallback": null,
+      "agent_trace": [
+        "search_code({\"query\": \"mean\"})",
+        "read_file({\"path\": \"app/stats.py\"})"
+      ]
+    },
+    {
+      "case_id": "clean_docstring",
+      "run": 1,
+      "expected_total": 0,
+      "expected_hit": 0,
+      "comments_total": 2,
+      "comments_correct": 0,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 1896,
+      "completion_tokens": 163,
+      "seconds": 2.646728207822889,
+      "is_clean": true,
+      "hit_categories": [],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/money.py",
+          "line": 2,
+          "severity": "style",
+          "message": "The docstring for the function 'to_cents' should follow the PEP 257 convention by being enclosed in triple double quotes.",
+          "kind": "inline"
+        },
+        {
+          "path": "app/money.py",
+          "line": 7,
+          "severity": "style",
+          "message": "The docstring for the function 'format_cents' should follow the PEP 257 convention by being enclosed in triple double quotes.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 2,
+      "agent_fallback": null,
+      "agent_trace": [
+        "search_code({\"query\": \"to_cents\"})",
+        "search_code({\"query\": \"format_cents\"})"
+      ]
+    },
+    {
+      "case_id": "clean_add_test",
+      "run": 1,
+      "expected_total": 0,
+      "expected_hit": 0,
+      "comments_total": 2,
+      "comments_correct": 0,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 1836,
+      "completion_tokens": 172,
+      "seconds": 2.8807507909368724,
+      "is_clean": true,
+      "hit_categories": [],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "tests/test_money.py",
+          "line": 5,
+          "severity": "bug",
+          "message": "The test case for whole dollars (to_cents(3) == 300) is incorrect. The expected value should be 300, which is correct, but the test does not cover negative values or zero. Consider adding tests for these edge cases.",
+          "kind": "inline"
+        },
+        {
+          "path": "tests/test_money.py",
+          "line": 9,
+          "severity": "bug",
+          "message": "The test case for fractions (to_cents(2.5) == 250) is correct, but it does not cover negative fractions or zero. Consider adding tests for these edge cases.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 1,
+      "agent_fallback": null,
+      "agent_trace": [
+        "read_file({\"path\":\"app/money.py\"})"
+      ]
+    },
+    {
+      "case_id": "hard_cross_file",
+      "run": 1,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 2171,
+      "completion_tokens": 129,
+      "seconds": 2.8691258751787245,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/api.py",
+          "line": 5,
+          "severity": "bug",
+          "message": "The function 'create_user' is called with three arguments in 'signup', but the previous implementation only accepted two arguments. This will raise a TypeError when 'signup' is called.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 2,
+      "agent_fallback": null,
+      "agent_trace": [
+        "search_code({\"query\": \"create_user\"})",
+        "read_file({\"path\": \"app/services.py\"})"
+      ]
+    },
+    {
+      "case_id": "clean_rename",
+      "run": 2,
+      "expected_total": 0,
+      "expected_hit": 0,
+      "comments_total": 1,
+      "comments_correct": 0,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 1845,
+      "completion_tokens": 150,
+      "seconds": 2.968524874886498,
+      "is_clean": true,
+      "hit_categories": [],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/stats.py",
+          "line": 2,
+          "severity": "bug",
+          "message": "The mean function now returns 0.0 for an empty input list, which is a change in behavior from the previous implementation that did not handle empty input. This could lead to incorrect results in calculations that depend on the mean function. Consider raising an exception or returning None instead.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 2,
+      "agent_fallback": null,
+      "agent_trace": [
+        "search_code({\"query\": \"mean\"})",
+        "read_file({\"path\": \"app/stats.py\"})"
+      ]
+    },
+    {
+      "case_id": "clean_docstring",
+      "run": 2,
+      "expected_total": 0,
+      "expected_hit": 0,
+      "comments_total": 2,
+      "comments_correct": 0,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 1896,
+      "completion_tokens": 151,
+      "seconds": 2.769396541872993,
+      "is_clean": true,
+      "hit_categories": [],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/money.py",
+          "line": 2,
+          "severity": "style",
+          "message": "Docstring should follow PEP 257 conventions. Consider adding a summary line and a more detailed description.",
+          "kind": "inline"
+        },
+        {
+          "path": "app/money.py",
+          "line": 7,
+          "severity": "style",
+          "message": "Docstring should follow PEP 257 conventions. Consider adding a summary line and a more detailed description.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 2,
+      "agent_fallback": null,
+      "agent_trace": [
+        "search_code({\"query\": \"to_cents\"})",
+        "search_code({\"query\": \"format_cents\"})"
+      ]
+    },
+    {
+      "case_id": "clean_add_test",
+      "run": 2,
+      "expected_total": 0,
+      "expected_hit": 0,
+      "comments_total": 2,
+      "comments_correct": 0,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 1836,
+      "completion_tokens": 135,
+      "seconds": 2.286439875140786,
+      "is_clean": true,
+      "hit_categories": [],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "tests/test_money.py",
+          "line": 5,
+          "severity": "bug",
+          "message": "The test for whole dollars does not account for negative values. Consider adding a test case for negative amounts to ensure the function handles them correctly.",
+          "kind": "inline"
+        },
+        {
+          "path": "tests/test_money.py",
+          "line": 9,
+          "severity": "bug",
+          "message": "The test for fractions does not account for negative fractions. Consider adding a test case for negative fractional amounts to ensure the function handles them correctly.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 1,
+      "agent_fallback": null,
+      "agent_trace": [
+        "read_file({\"path\":\"app/money.py\"})"
+      ]
+    },
+    {
+      "case_id": "hard_cross_file",
+      "run": 2,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 2171,
+      "completion_tokens": 136,
+      "seconds": 2.7457783750724047,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/api.py",
+          "line": 5,
+          "severity": "bug",
+          "message": "The 'create_user' function is called with three arguments in the 'signup' function, but the original 'create_user' function only accepted two arguments. This will cause a TypeError when 'signup' is called.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 2,
+      "agent_fallback": null,
+      "agent_trace": [
+        "search_code({\"query\": \"create_user\"})",
+        "read_file({\"path\": \"app/services.py\"})"
+      ]
+    },
+    {
+      "case_id": "clean_rename",
+      "run": 3,
+      "expected_total": 0,
+      "expected_hit": 0,
+      "comments_total": 1,
+      "comments_correct": 0,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 1845,
+      "completion_tokens": 150,
+      "seconds": 2.5398054169490933,
+      "is_clean": true,
+      "hit_categories": [],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/stats.py",
+          "line": 2,
+          "severity": "bug",
+          "message": "The mean function now returns 0.0 for an empty input list, which is a change in behavior from the previous implementation that did not handle empty lists. This could lead to incorrect results in calculations that depend on the mean function. Consider raising an exception or returning None instead.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 2,
+      "agent_fallback": null,
+      "agent_trace": [
+        "search_code({\"query\": \"mean\"})",
+        "read_file({\"path\": \"app/stats.py\"})"
+      ]
+    },
+    {
+      "case_id": "clean_docstring",
+      "run": 3,
+      "expected_total": 0,
+      "expected_hit": 0,
+      "comments_total": 2,
+      "comments_correct": 0,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 1896,
+      "completion_tokens": 157,
+      "seconds": 2.6625240410212427,
+      "is_clean": true,
+      "hit_categories": [],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/money.py",
+          "line": 2,
+          "severity": "style",
+          "message": "Docstring should follow PEP 257 conventions. Consider adding a one-line summary and a more detailed description if necessary.",
+          "kind": "inline"
+        },
+        {
+          "path": "app/money.py",
+          "line": 7,
+          "severity": "style",
+          "message": "Docstring should follow PEP 257 conventions. Consider adding a one-line summary and a more detailed description if necessary.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 2,
+      "agent_fallback": null,
+      "agent_trace": [
+        "search_code({\"query\": \"to_cents\"})",
+        "search_code({\"query\": \"format_cents\"})"
+      ]
+    },
+    {
+      "case_id": "clean_add_test",
+      "run": 3,
+      "expected_total": 0,
+      "expected_hit": 0,
+      "comments_total": 2,
+      "comments_correct": 0,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 1836,
+      "completion_tokens": 206,
+      "seconds": 4.09498120797798,
+      "is_clean": true,
+      "hit_categories": [],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "tests/test_money.py",
+          "line": 5,
+          "severity": "bug",
+          "message": "The test for whole dollars (3) should assert that to_cents(3) == 300, which is correct. However, the test for fractions (2.5) should assert that to_cents(2.5) == 250, which is also correct. The implementation of to_cents does not handle negative values or non-numeric inputs, which could lead to unexpected behavior. Consider adding tests for these cases.",
+          "kind": "inline"
+        },
+        {
+          "path": "tests/test_money.py",
+          "line": 9,
+          "severity": "bug",
+          "message": "The test for fractions (2.5) is correct, but the implementation of to_cents does not handle negative values or non-numeric inputs. Consider adding tests for these cases to ensure robustness.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 1,
+      "agent_fallback": null,
+      "agent_trace": [
+        "read_file({\"path\":\"app/money.py\"})"
+      ]
+    },
+    {
+      "case_id": "hard_cross_file",
+      "run": 3,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 2171,
+      "completion_tokens": 129,
+      "seconds": 2.5614731670357287,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/api.py",
+          "line": 5,
+          "severity": "bug",
+          "message": "The 'create_user' function is called with three arguments in 'signup', but the original function only accepted two arguments. This will cause a TypeError when 'signup' is called.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "agent",
+      "agent_steps": 2,
+      "agent_tool_calls": 2,
+      "agent_fallback": null,
+      "agent_trace": [
+        "search_code({\"query\": \"create_user\"})",
+        "read_file({\"path\": \"app/services.py\"})"
+      ]
+    }
+  ]
+}

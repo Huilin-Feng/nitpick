@@ -118,3 +118,9 @@ class ReviewResult:
     agent_steps: int = 0
     agent_tool_calls: int = 0
     agent_fallback: str | None = None
+    # Agent mode only: every tool call as "name(arguments)", in order.
+    # Lets us see what the agent looked at when tuning it.
+    agent_trace: list[str] = field(default_factory=list)
+    # Agent mode only: comments removed because the model marked them as
+    # not confident or not introduced by this PR.
+    agent_filtered: int = 0

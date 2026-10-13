@@ -44,6 +44,12 @@ def build_case(case_dir: Path) -> str:
             if child.name != ".git":
                 shutil.rmtree(child) if child.is_dir() else child.unlink()
         copy_tree(case_dir / "after", repo)
+        # Drop the index and re-add everything so git hashes every file's
+        # content. Otherwise git trusts its stat cache: copytree keeps the
+        # fixture's mtime, so an "after" file with the same size and mtime as
+        # its "before" version (e.g. a rename to an equally long name) looks
+        # unchanged, and its diff silently comes out empty.
+        git(repo, "rm", "-r", "-q", "--cached", "--ignore-unmatch", ".")
         git(repo, "add", "-A")
         # -M detects renames, matching what GitHub shows.
         return git(repo, "diff", "--cached", "--no-color", "-M")

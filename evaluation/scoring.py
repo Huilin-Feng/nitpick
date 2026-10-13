@@ -33,6 +33,9 @@ class Case:
     description: str
     diff_text: str
     expected: list[ExpectedIssue]
+    # fixtures/<id>/after/: the repository as of the PR's head commit.
+    # The agent's read_file / search_code tools look at this directory.
+    snapshot_dir: Path | None = None
 
     @property
     def is_clean(self) -> bool:
@@ -60,6 +63,13 @@ class RunScore:
     hit_categories: list[str] = field(default_factory=list)
     missed_categories: list[str] = field(default_factory=list)
     comments: list[dict] = field(default_factory=list)
+    # Agent mode bookkeeping (pipeline runs keep the defaults).
+    mode: str = "pipeline"
+    agent_steps: int = 0
+    agent_tool_calls: int = 0
+    agent_fallback: str | None = None
+    agent_trace: list[str] = field(default_factory=list)
+    agent_filtered: int = 0
 
 
 def load_cases(path: Path) -> list[Case]:
@@ -75,7 +85,12 @@ def load_cases(path: Path) -> list[Case]:
             for e in raw["expected"]
         ]
         diff_text = (path.parent / raw["diff"]).read_text()
-        cases.append(Case(raw["id"], raw.get("description", ""), diff_text, expected))
+        # Same layout build_diffs.py reads: fixtures/<id>/after/.
+        snapshot_dir = path.parent / "fixtures" / raw["id"] / "after"
+        cases.append(Case(
+            raw["id"], raw.get("description", ""), diff_text, expected,
+            snapshot_dir if snapshot_dir.is_dir() else None,
+        ))
     return cases
 
 
@@ -183,4 +198,25 @@ def summarize(scores: list[RunScore], price_in: float, price_out: float) -> dict
         "avg_cost_usd_per_review": cost / case_runs,
         "avg_seconds_per_review": sum(s.seconds for s in scores) / case_runs,
         "total_cost_usd": cost,
+    }
+
+
+def summarize_agent(scores: list[RunScore]) -> dict:
+    """How the agent behaved: did it finish, how much did it look around."""
+    n = max(1, len(scores))
+    finished = [s for s in scores if s.mode == "agent"]
+    fallbacks: dict[str, int] = {}
+    for s in scores:
+        if s.agent_fallback:
+            fallbacks[s.agent_fallback] = fallbacks.get(s.agent_fallback, 0) + 1
+    return {
+        # Share of reviews the agent completed itself (no pipeline fallback).
+        "agent_finished_rate": len(finished) / n,
+        "avg_steps": sum(s.agent_steps for s in scores) / n,
+        "avg_tool_calls": sum(s.agent_tool_calls for s in scores) / n,
+        # Reviews where the agent read or searched code at least once.
+        "used_tools_rate": sum(1 for s in scores if s.agent_tool_calls > 0) / n,
+        "fallbacks": dict(sorted(fallbacks.items())),
+        # Comments the agent's own self-check removed (unsure / pre-existing).
+        "avg_filtered": sum(s.agent_filtered for s in scores) / n,
     }
