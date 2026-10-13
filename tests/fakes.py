@@ -49,3 +49,28 @@ class FakeGitHub:
         self.reviews.append({"commit_id": commit_id, "body": body, "comments": comments})
         status = self.review_statuses.pop(0) if self.review_statuses else 200
         return FakeResponse(status)
+
+
+class FakeToolLLM:
+    """Scripted agent LLM: returns ChatTurns in order, records each request.
+
+    `tokens_per_call` simulates usage so the agent's token budget can be tested.
+    """
+
+    def __init__(self, turns, tokens_per_call=0):
+        # Each item is either a ChatTurn (returned) or an Exception (raised).
+        self.turns = list(turns)
+        self.requests = []
+        self.tokens_per_call = tokens_per_call
+        self.total_tokens = 0
+
+    def chat(self, messages, tools):
+        # Copy, because the agent keeps appending to the same list.
+        self.requests.append([dict(m) for m in messages])
+        self.total_tokens += self.tokens_per_call
+        if not self.turns:
+            raise AssertionError("FakeToolLLM ran out of scripted turns")
+        item = self.turns.pop(0)
+        if isinstance(item, Exception):
+            raise item
+        return item

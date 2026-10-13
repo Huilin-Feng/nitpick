@@ -110,3 +110,11 @@ class ReviewResult:
     failed_chunks: int = 0
     # Set for incremental reviews: only changes after this commit were reviewed.
     since_sha: str | None = None
+    # Which mode produced this result: "pipeline" or "agent". An agent run
+    # that falls back reports "pipeline" here and the reason below.
+    mode: str = "pipeline"
+    # Agent mode only: LLM calls the agent made, tool calls it ran, and
+    # why it gave up and used the pipeline instead (None if it finished).
+    agent_steps: int = 0
+    agent_tool_calls: int = 0
+    agent_fallback: str | None = None

@@ -39,11 +39,7 @@ class Reviewer:
         """
         files = parse_diff(diff_text)
         chunks, skipped = build_chunks(files, self.max_tokens_per_chunk, self.max_chunks)
-        commentable = {f.path: f.commentable_lines() for f in files}
-        added = {f.path: f.added_lines() for f in files}
-        positionable = None
-        if position_diff_text is not None:
-            positionable = {f.path: f.commentable_lines() for f in parse_diff(position_diff_text)}
+        placer = CommentPlacer(files, position_diff_text)
 
         summaries: list[str] = []
         comments: list[ReviewComment] = []
@@ -64,24 +60,13 @@ class Reviewer:
             if isinstance(summary, str) and summary.strip():
                 summaries.append(summary.strip())
 
-            for raw in data.get("comments") or []:
-                comment = _to_comment(raw)
-                if comment is None:
-                    dropped += 1
-                elif comment.line in added.get(comment.path, set()) and (
-                    positionable is None or comment.line in positionable.get(comment.path, set())
-                ):
-                    comments.append(comment)
-                elif comment.line in commentable.get(comment.path, set()):
-                    # Unchanged context line: keep it, but out of the inline review.
-                    notes.append(comment)
-                else:
-                    # Not part of the diff at all; GitHub would reject it.
-                    dropped += 1
+            inline, context, bad = placer.place(data.get("comments") or [])
+            comments += inline
+            notes += context
+            dropped += bad
 
-        comments, cut = _rank_and_cap(comments, self.max_comments)
-        notes, cut_notes = _rank_and_cap(notes, self.max_comments)
-        dropped += cut + cut_notes
+        comments, notes, cut = finalize_comments(comments, notes, self.max_comments)
+        dropped += cut
 
         return ReviewResult(
             summary=" ".join(summaries) or "No significant issues found.",
@@ -91,6 +76,51 @@ class Reviewer:
             dropped_comments=dropped,
             failed_chunks=failed,
         )
+
+
+class CommentPlacer:
+    """Decides where each LLM comment goes: inline, note, or dropped.
+
+    Shared by the pipeline Reviewer and the AgentReviewer, so both modes
+    apply exactly the same rules and their evaluation numbers compare fairly.
+    """
+
+    def __init__(self, files: list, position_diff_text: str | None = None) -> None:
+        self.commentable = {f.path: f.commentable_lines() for f in files}
+        self.added = {f.path: f.added_lines() for f in files}
+        self.positionable = None
+        if position_diff_text is not None:
+            self.positionable = {f.path: f.commentable_lines() for f in parse_diff(position_diff_text)}
+
+    def place(self, raws: list) -> tuple[list[ReviewComment], list[ReviewComment], int]:
+        """Return (inline comments, notes, number dropped)."""
+        inline: list[ReviewComment] = []
+        notes: list[ReviewComment] = []
+        dropped = 0
+        for raw in raws:
+            comment = _to_comment(raw)
+            if comment is None:
+                dropped += 1
+            elif comment.line in self.added.get(comment.path, set()) and (
+                self.positionable is None or comment.line in self.positionable.get(comment.path, set())
+            ):
+                inline.append(comment)
+            elif comment.line in self.commentable.get(comment.path, set()):
+                # Unchanged context line: keep it, but out of the inline review.
+                notes.append(comment)
+            else:
+                # Not part of the diff at all; GitHub would reject it.
+                dropped += 1
+        return inline, notes, dropped
+
+
+def finalize_comments(
+    comments: list[ReviewComment], notes: list[ReviewComment], limit: int
+) -> tuple[list[ReviewComment], list[ReviewComment], int]:
+    """Rank and cap both lists; return (comments, notes, number cut)."""
+    comments, cut = _rank_and_cap(comments, limit)
+    notes, cut_notes = _rank_and_cap(notes, limit)
+    return comments, notes, cut + cut_notes
 
 
 def _rank_and_cap(items: list[ReviewComment], limit: int) -> tuple[list[ReviewComment], int]:
