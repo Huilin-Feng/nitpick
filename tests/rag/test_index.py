@@ -74,3 +74,14 @@ def test_shallow_clone_at_fetches_one_commit(tmp_path):
         assert "first" in (d / "m.py").read_text()
         clone = d
     assert not clone.exists()
+
+
+def test_untracked_dir_inside_git_repo_falls_back_to_walk(tmp_path):
+    try:
+        _git(tmp_path, "init", "-q")
+    except (FileNotFoundError, subprocess.CalledProcessError):
+        pytest.skip("git not available")
+    fixture = tmp_path / "fixtures" / "case1" / "after" / "app"
+    fixture.mkdir(parents=True)
+    (fixture / "api.py").write_text("def invite():\n    pass\n")
+    assert list_source_files(tmp_path / "fixtures" / "case1" / "after") == ["app/api.py"]

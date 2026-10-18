@@ -4,6 +4,8 @@
     python -m evaluation.run_eval --label baseline       # real run, 3 repeats per case
     python -m evaluation.run_eval --label baseline --runs 1 --only bug_off_by_one
     python -m evaluation.run_eval --mode agent --label agent     # agent mode, same cases
+    python -m evaluation.run_eval --mode rag --label rag-hybrid  # pipeline + retrieved repo code
+    python -m evaluation.run_eval --mode rag --rag-variant symbol --label rag-symbol
 
 Results are printed and saved to evaluation/results/<time>_<label>.json,
 including every comment the LLM made, so you can review them by hand.
@@ -21,10 +23,15 @@ from evaluation.scoring import RunScore, load_cases, score_comments, summarize, 
 from nitpick.agent import AgentReviewer
 from nitpick.config import REVIEW_MODES, Settings
 from nitpick.llm import ChatTurn, ToolCall
+from nitpick.rag import PRESETS, ChromaStore, HashEmbedder, OpenAIEmbedder, RagContextBuilder
 from nitpick.repo_snapshot import RepoSnapshot
 from nitpick.reviewer import Reviewer
 
 ROOT = Path(__file__).parent
+# "rag" is an evaluation-only mode for now, so it is not added to REVIEW_MODES:
+# the webhook server cannot be switched to it by accident.
+EVAL_MODES = [*REVIEW_MODES, "rag"]
+RAG_VARIANTS = {"hybrid": "rag-hybrid", "semantic": "rag-semantic", "symbol": "rag-symbol"}
 
 
 class SilentLLM:
@@ -49,12 +56,16 @@ def parse_args(argv: list[str] | None) -> argparse.Namespace:
     p.add_argument("--tolerance", type=int, default=3, help="allowed distance in lines for a hit")
     p.add_argument("--max-tokens", type=int, default=None, help="override MAX_TOKENS_PER_CHUNK")
     p.add_argument("--max-chunks", type=int, default=None, help="override MAX_CHUNKS")
-    p.add_argument("--mode", choices=REVIEW_MODES, default=None, help="override REVIEW_MODE")
+    p.add_argument("--mode", choices=EVAL_MODES, default=None, help="override REVIEW_MODE")
+    p.add_argument("--rag-variant", choices=list(RAG_VARIANTS), default="hybrid",
+                   help="rag mode: which retrieval paths to use (ablation)")
+    p.add_argument("--rag-budget", type=int, default=None, help="rag mode: max tokens of retrieved code")
     p.add_argument("--agent-max-steps", type=int, default=None, help="override AGENT_MAX_STEPS")
     p.add_argument("--agent-max-tokens", type=int, default=None, help="override AGENT_MAX_TOKENS")
     # USD per 1M tokens. Defaults are for gpt-4o-mini; check current pricing.
     p.add_argument("--price-in", type=float, default=0.15)
     p.add_argument("--price-out", type=float, default=0.60)
+    p.add_argument("--price-embed", type=float, default=0.02, help="text-embedding-3-small, per 1M tokens")
     p.add_argument("--dry-run", action="store_true", help="use a fake LLM; costs nothing")
     p.add_argument("--no-save", action="store_true")
     return p.parse_args(argv)
@@ -68,6 +79,68 @@ def build_llm(settings: Settings, dry_run: bool):
     from nitpick.llm import OpenAIClient
 
     return OpenAIClient(settings.openai_api_key, settings.openai_model)
+
+
+def build_embedder(settings: Settings, dry_run: bool):
+    if dry_run:
+        return HashEmbedder()  # offline and free; retrieval still runs end to end
+    from openai import OpenAI
+
+    return OpenAIEmbedder(client=OpenAI(api_key=settings.openai_api_key))
+
+
+class RagCache:
+    """One index per case, built on first use and reused by every run.
+
+    The index is built from the same fixtures/<id>/after/ snapshot the agent
+    reads, so both modes see the same repository. Files changed by the PR are
+    excluded at query time, so indexing the "after" version leaks nothing.
+    """
+
+    def __init__(self, embedder, variant: str, budget: int | None) -> None:
+        import chromadb
+
+        self.client = chromadb.EphemeralClient()  # in memory, gone when the process exits
+        self.embedder = embedder
+        self.config = PRESETS[RAG_VARIANTS[variant]]
+        if budget:
+            from dataclasses import replace
+
+            self.config = replace(self.config, token_budget=budget)
+        self.builders: dict[str, RagContextBuilder] = {}
+
+    def get(self, case) -> RagContextBuilder:
+        if case.id not in self.builders:
+            store = ChromaStore(f"eval-{case.id}"[:63], client=self.client)
+            self.builders[case.id] = RagContextBuilder.from_repo(
+                case.snapshot_dir, repo_slug=case.id, commit_sha="after",
+                embedder=self.embedder, store=store, config=self.config,
+            )
+        return self.builders[case.id]
+
+
+def summarize_rag(rag_runs: list[dict], cache: RagCache, price_embed: float) -> dict:
+    n = len(rag_runs) or 1
+    index_tokens = sum(b.index_stats.embedding_tokens for b in cache.builders.values())
+    query_tokens = sum(r["query_embedding_tokens"] for r in rag_runs)
+    return {
+        "variant": asdict(cache.config),
+        "indexed_chunks": sum(b.index_stats.chunks for b in cache.builders.values()),
+        "index_embedding_tokens": index_tokens,
+        "index_cost_usd": index_tokens / 1e6 * price_embed,
+        "avg_retrieved_chunks": sum(len(r["retrieved"]) for r in rag_runs) / n,
+        "avg_context_tokens": sum(r["context_tokens"] for r in rag_runs) / n,
+        "avg_query_embedding_cost_usd": query_tokens / 1e6 * price_embed / n,
+        "dropped_for_budget": sum(r["dropped_for_budget"] for r in rag_runs),
+    }
+
+
+def print_rag_report(rag: dict) -> None:
+    print(f"indexed chunks:         {rag['indexed_chunks']}  (one-time embedding cost ${rag['index_cost_usd']:.5f})")
+    print(f"avg retrieved chunks:   {rag['avg_retrieved_chunks']:.1f}  (~{rag['avg_context_tokens']:.0f} prompt tokens)")
+    print(f"avg query embed cost:   ${rag['avg_query_embedding_cost_usd']:.6f} per review (not in avg cost above)")
+    if rag["dropped_for_budget"]:
+        print(f"cut by token budget:    {rag['dropped_for_budget']} chunks in total")
 
 
 def fmt(value: float | None, pct: bool = True) -> str:
@@ -134,10 +207,10 @@ def main(argv: list[str] | None = None) -> int:
     agent_max_steps = args.agent_max_steps or settings.agent_max_steps
     agent_max_tokens = args.agent_max_tokens or settings.agent_max_tokens
 
-    if mode == "agent":
+    if mode in ("agent", "rag"):
         missing = [c.id for c in cases if c.snapshot_dir is None]
         if missing:
-            print("agent mode needs fixtures/<id>/after/ for:", *missing, sep="\n  ")
+            print(f"{mode} mode needs fixtures/<id>/after/ for:", *missing, sep="\n  ")
             return 1
 
     llm = build_llm(settings, args.dry_run)
@@ -151,14 +224,33 @@ def main(argv: list[str] | None = None) -> int:
         max_tokens_per_chunk=max_tokens, max_comments=settings.max_comments,
     )
 
+    rag_cache = RagCache(build_embedder(settings, args.dry_run), args.rag_variant, args.rag_budget) if mode == "rag" else None
+    rag_runs: list[dict] = []
+
     scores: list[RunScore] = []
     for run in range(1, args.runs + 1):
         for case in cases:
             if hasattr(llm, "reset_usage"):
                 llm.reset_usage()
+            if mode == "rag":
+                # Build (or reuse) the case's index before timing starts, so the
+                # one-time indexing cost is not counted as review latency.
+                rag = rag_cache.get(case)
             started = time.perf_counter()
             if mode == "agent":
                 result = agent.review(case.diff_text, RepoSnapshot(case.snapshot_dir))
+            elif mode == "rag":
+                related = rag.build(case.diff_text)
+                result = reviewer.review(case.diff_text, related_code=related)
+                rr = rag.last_result
+                rag_runs.append({
+                    "case_id": case.id,
+                    "run": run,
+                    "retrieved": [f"{r.chunk.id} {r.reason}" for r in rr.chunks],
+                    "context_tokens": rr.context_tokens,
+                    "query_embedding_tokens": rr.embedding_tokens,
+                    "dropped_for_budget": rr.dropped_for_budget,
+                })
             else:
                 result = reviewer.review(case.diff_text)
             seconds = time.perf_counter() - started
@@ -197,6 +289,8 @@ def main(argv: list[str] | None = None) -> int:
                 agent_filtered=result.agent_filtered,
             ))
             agent_info = ""
+            if mode == "rag":
+                agent_info = f"  retrieved {len(rag_runs[-1]['retrieved'])}"
             if mode == "agent":
                 agent_info = f"  steps {result.agent_steps}  tools {result.agent_tool_calls}"
                 if result.agent_fallback:
@@ -209,6 +303,10 @@ def main(argv: list[str] | None = None) -> int:
     if mode == "agent":
         summary["agent"] = summarize_agent(scores)
         print_agent_report(summary["agent"])
+    if mode == "rag":
+        summary["rag"] = summarize_rag(rag_runs, rag_cache, args.price_embed)
+        print_rag_report(summary["rag"])
+        summary["rag"]["per_review"] = rag_runs
 
     if not args.no_save:
         out_dir = ROOT / "results"
@@ -219,6 +317,7 @@ def main(argv: list[str] | None = None) -> int:
             "mode": mode,
             "agent_max_steps": agent_max_steps if mode == "agent" else None,
             "agent_max_tokens": agent_max_tokens if mode == "agent" else None,
+            "rag_variant": args.rag_variant if mode == "rag" else None,
             "model": "dry-run" if args.dry_run else settings.openai_model,
             "max_tokens_per_chunk": max_tokens,
             "max_chunks": max_chunks,

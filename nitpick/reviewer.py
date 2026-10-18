@@ -28,7 +28,9 @@ class Reviewer:
         self.max_comments = max_comments
         self.max_chunks = max_chunks
 
-    def review(self, diff_text: str, position_diff_text: str | None = None) -> ReviewResult:
+    def review(
+        self, diff_text: str, position_diff_text: str | None = None, related_code: str = ""
+    ) -> ReviewResult:
         """Review `diff_text`.
 
         `position_diff_text` is used for incremental reviews: `diff_text`
@@ -36,6 +38,9 @@ class Reviewer:
         against the whole PR diff. A line can be new in this push yet not
         part of the PR diff (e.g. a change that was reverted back to the
         base version); such comments become notes instead of being rejected.
+
+        `related_code` is repository code retrieved by RAG (rag mode). It is
+        appended to every chunk's prompt; pipeline mode passes "".
         """
         files = parse_diff(diff_text)
         chunks, skipped = build_chunks(files, self.max_tokens_per_chunk, self.max_chunks)
@@ -49,7 +54,7 @@ class Reviewer:
 
         for chunk in chunks:
             try:
-                data = self.llm.complete_json(SYSTEM_PROMPT, build_user_prompt(chunk.text))
+                data = self.llm.complete_json(SYSTEM_PROMPT, build_user_prompt(chunk.text, related_code))
             except Exception:
                 # One failing chunk should not kill the whole review.
                 logger.exception("LLM call failed for chunk with %d file(s)", len(chunk.files))

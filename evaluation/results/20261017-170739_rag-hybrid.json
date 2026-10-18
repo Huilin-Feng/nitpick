@@ -1,0 +1,2775 @@
+{
+  "config": {
+    "label": "rag-hybrid",
+    "mode": "rag",
+    "agent_max_steps": null,
+    "agent_max_tokens": null,
+    "rag_variant": "hybrid",
+    "model": "gpt-4o-mini",
+    "max_tokens_per_chunk": 6000,
+    "max_chunks": 5,
+    "max_comments": 10,
+    "tolerance": 3,
+    "runs": 3
+  },
+  "summary": {
+    "runs": 3,
+    "recall": 0.9791666666666666,
+    "recall_with_notes": 0.9791666666666666,
+    "recall_per_run": [
+      1.0,
+      0.9375,
+      1.0
+    ],
+    "strict_precision": 1.0,
+    "false_positives_per_clean_pr": 0.0,
+    "notes_per_clean_pr": 0.4,
+    "notes_per_review": 0.09523809523809523,
+    "validity": 0.9298245614035088,
+    "recall_by_category": {
+      "bug": 0.9696969696969697,
+      "performance": 1.0,
+      "security": 1.0
+    },
+    "failed_chunks": 0,
+    "avg_cost_usd_per_review": 0.00020883095238095239,
+    "avg_seconds_per_review": 2.175864198367067,
+    "total_cost_usd": 0.01315635,
+    "rag": {
+      "variant": {
+        "use_symbols": true,
+        "use_semantic": true,
+        "k_semantic": 5,
+        "max_symbol_hits": 6,
+        "max_symbols": 10,
+        "min_semantic_score": 0.25,
+        "token_budget": 3000,
+        "max_hunks": 20
+      },
+      "indexed_chunks": 197,
+      "index_embedding_tokens": 10661,
+      "index_cost_usd": 0.00021322000000000002,
+      "avg_retrieved_chunks": 0.5238095238095238,
+      "avg_context_tokens": 22.857142857142858,
+      "avg_query_embedding_cost_usd": 1.1923809523809524e-06,
+      "dropped_for_budget": 0,
+      "per_review": [
+        {
+          "case_id": "bug_off_by_one",
+          "run": 1,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 78,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "bug_mutable_default",
+          "run": 1,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 33,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "bug_swallowed_exception",
+          "run": 1,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 48,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "bug_unclosed_file",
+          "run": 1,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 28,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "bug_none_access",
+          "run": 1,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 26,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "bug_is_comparison",
+          "run": 1,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 26,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "sec_sql_injection",
+          "run": 1,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 42,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "sec_hardcoded_key",
+          "run": 1,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 71,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "sec_shell_injection",
+          "run": 1,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 53,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "perf_n_plus_one",
+          "run": 1,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 79,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "perf_list_membership",
+          "run": 1,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 53,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "clean_rename",
+          "run": 1,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 36,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "clean_docstring",
+          "run": 1,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 34,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "clean_add_test",
+          "run": 1,
+          "retrieved": [
+            "app/money.py:1-2 semantic"
+          ],
+          "context_tokens": 33,
+          "query_embedding_tokens": 54,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "hard_cross_file",
+          "run": 1,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 73,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "hard_late_hunk",
+          "run": 1,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 293,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "ctx_units_stale_caller",
+          "run": 1,
+          "retrieved": [
+            "app/checkout.py:1-4 semantic",
+            "app/checkout.py:6-7 semantic"
+          ],
+          "context_tokens": 79,
+          "query_embedding_tokens": 100,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "ctx_rename_stale_import",
+          "run": 1,
+          "retrieved": [
+            "app/report.py:1-2 symbol:format_date",
+            "app/report.py:4-5 symbol:format_date"
+          ],
+          "context_tokens": 78,
+          "query_embedding_tokens": 20,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "ctx_shared_cache_mutation",
+          "run": 1,
+          "retrieved": [
+            "app/storage.py:6-11 semantic",
+            "app/storage.py:1-4 semantic"
+          ],
+          "context_tokens": 114,
+          "query_embedding_tokens": 33,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "ctx_rename_all_updated",
+          "run": 1,
+          "retrieved": [
+            "app/views.py:4-5 semantic",
+            "app/views.py:1-2 semantic"
+          ],
+          "context_tokens": 66,
+          "query_embedding_tokens": 45,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "ctx_key_has_default",
+          "run": 1,
+          "retrieved": [
+            "app/settings.py:6-11 semantic",
+            "app/settings.py:1-4 semantic"
+          ],
+          "context_tokens": 110,
+          "query_embedding_tokens": 27,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "bug_off_by_one",
+          "run": 2,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 78,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "bug_mutable_default",
+          "run": 2,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 33,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "bug_swallowed_exception",
+          "run": 2,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 48,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "bug_unclosed_file",
+          "run": 2,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 28,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "bug_none_access",
+          "run": 2,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 26,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "bug_is_comparison",
+          "run": 2,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 26,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "sec_sql_injection",
+          "run": 2,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 42,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "sec_hardcoded_key",
+          "run": 2,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 71,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "sec_shell_injection",
+          "run": 2,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 53,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "perf_n_plus_one",
+          "run": 2,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 79,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "perf_list_membership",
+          "run": 2,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 53,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "clean_rename",
+          "run": 2,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 36,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "clean_docstring",
+          "run": 2,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 34,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "clean_add_test",
+          "run": 2,
+          "retrieved": [
+            "app/money.py:1-2 semantic"
+          ],
+          "context_tokens": 33,
+          "query_embedding_tokens": 54,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "hard_cross_file",
+          "run": 2,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 73,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "hard_late_hunk",
+          "run": 2,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 293,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "ctx_units_stale_caller",
+          "run": 2,
+          "retrieved": [
+            "app/checkout.py:1-4 semantic",
+            "app/checkout.py:6-7 semantic"
+          ],
+          "context_tokens": 79,
+          "query_embedding_tokens": 100,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "ctx_rename_stale_import",
+          "run": 2,
+          "retrieved": [
+            "app/report.py:1-2 symbol:format_date",
+            "app/report.py:4-5 symbol:format_date"
+          ],
+          "context_tokens": 78,
+          "query_embedding_tokens": 20,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "ctx_shared_cache_mutation",
+          "run": 2,
+          "retrieved": [
+            "app/storage.py:6-11 semantic",
+            "app/storage.py:1-4 semantic"
+          ],
+          "context_tokens": 114,
+          "query_embedding_tokens": 33,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "ctx_rename_all_updated",
+          "run": 2,
+          "retrieved": [
+            "app/views.py:4-5 semantic",
+            "app/views.py:1-2 semantic"
+          ],
+          "context_tokens": 66,
+          "query_embedding_tokens": 45,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "ctx_key_has_default",
+          "run": 2,
+          "retrieved": [
+            "app/settings.py:6-11 semantic",
+            "app/settings.py:1-4 semantic"
+          ],
+          "context_tokens": 110,
+          "query_embedding_tokens": 27,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "bug_off_by_one",
+          "run": 3,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 78,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "bug_mutable_default",
+          "run": 3,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 33,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "bug_swallowed_exception",
+          "run": 3,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 48,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "bug_unclosed_file",
+          "run": 3,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 28,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "bug_none_access",
+          "run": 3,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 26,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "bug_is_comparison",
+          "run": 3,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 26,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "sec_sql_injection",
+          "run": 3,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 42,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "sec_hardcoded_key",
+          "run": 3,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 71,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "sec_shell_injection",
+          "run": 3,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 53,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "perf_n_plus_one",
+          "run": 3,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 79,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "perf_list_membership",
+          "run": 3,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 53,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "clean_rename",
+          "run": 3,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 36,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "clean_docstring",
+          "run": 3,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 34,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "clean_add_test",
+          "run": 3,
+          "retrieved": [
+            "app/money.py:1-2 semantic"
+          ],
+          "context_tokens": 33,
+          "query_embedding_tokens": 54,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "hard_cross_file",
+          "run": 3,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 73,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "hard_late_hunk",
+          "run": 3,
+          "retrieved": [],
+          "context_tokens": 0,
+          "query_embedding_tokens": 293,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "ctx_units_stale_caller",
+          "run": 3,
+          "retrieved": [
+            "app/checkout.py:1-4 semantic",
+            "app/checkout.py:6-7 semantic"
+          ],
+          "context_tokens": 79,
+          "query_embedding_tokens": 100,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "ctx_rename_stale_import",
+          "run": 3,
+          "retrieved": [
+            "app/report.py:1-2 symbol:format_date",
+            "app/report.py:4-5 symbol:format_date"
+          ],
+          "context_tokens": 78,
+          "query_embedding_tokens": 20,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "ctx_shared_cache_mutation",
+          "run": 3,
+          "retrieved": [
+            "app/storage.py:6-11 semantic",
+            "app/storage.py:1-4 semantic"
+          ],
+          "context_tokens": 114,
+          "query_embedding_tokens": 33,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "ctx_rename_all_updated",
+          "run": 3,
+          "retrieved": [
+            "app/views.py:4-5 semantic",
+            "app/views.py:1-2 semantic"
+          ],
+          "context_tokens": 66,
+          "query_embedding_tokens": 45,
+          "dropped_for_budget": 0
+        },
+        {
+          "case_id": "ctx_key_has_default",
+          "run": 3,
+          "retrieved": [
+            "app/settings.py:6-11 semantic",
+            "app/settings.py:1-4 semantic"
+          ],
+          "context_tokens": 110,
+          "query_embedding_tokens": 27,
+          "dropped_for_budget": 0
+        }
+      ]
+    }
+  },
+  "scores": [
+    {
+      "case_id": "bug_off_by_one",
+      "run": 1,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 384,
+      "completion_tokens": 93,
+      "seconds": 2.7840942088514566,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/pagination.py",
+          "line": 12,
+          "severity": "bug",
+          "message": "The range should include the last page, so it should be range(1, total + 1) instead of range(1, total).",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "bug_mutable_default",
+      "run": 1,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 296,
+      "completion_tokens": 121,
+      "seconds": 2.394200999988243,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/cart.py",
+          "line": 1,
+          "severity": "bug",
+          "message": "Using a mutable default argument (cart=[]) can lead to shared state across function calls. Change the default to None and initialize the cart inside the function: 'def add_item(item, cart=None):' followed by 'if cart is None: cart = []'.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "bug_swallowed_exception",
+      "run": 1,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 362,
+      "completion_tokens": 86,
+      "seconds": 2.214853416197002,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/payments.py",
+          "line": 11,
+          "severity": "bug",
+          "message": "Catching all exceptions without handling them can hide errors. Consider logging the exception or handling specific exceptions to avoid silent failures.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "bug_unclosed_file",
+      "run": 1,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 324,
+      "completion_tokens": 101,
+      "seconds": 2.924579542130232,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/config_loader.py",
+          "line": 7,
+          "severity": "bug",
+          "message": "The file is opened but not closed, which can lead to resource leaks. Use a context manager (with statement) to ensure the file is properly closed after reading.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "bug_none_access",
+      "run": 1,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 334,
+      "completion_tokens": 92,
+      "seconds": 1.6679588749539107,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/users.py",
+          "line": 9,
+          "severity": "bug",
+          "message": "This code will raise a KeyError if the user_id does not exist in USERS. You should check if user is None before attempting to access user['email'].",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "bug_is_comparison",
+      "run": 1,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 311,
+      "completion_tokens": 89,
+      "seconds": 1.6992720421403646,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/status.py",
+          "line": 6,
+          "severity": "bug",
+          "message": "Use '==' instead of 'is' for string comparison. Change 'if account.status is \"active\"' to 'if account.status == \"active\"'.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "sec_sql_injection",
+      "run": 1,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 331,
+      "completion_tokens": 103,
+      "seconds": 1.8360235840082169,
+      "is_clean": false,
+      "hit_categories": [
+        "security"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/db.py",
+          "line": 10,
+          "severity": "security",
+          "message": "The SQL query is vulnerable to SQL injection. Use parameterized queries instead: cursor.execute('SELECT id, name, email FROM users WHERE name = ?', (name,))",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "sec_hardcoded_key",
+      "run": 1,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 383,
+      "completion_tokens": 90,
+      "seconds": 1.7995726661756635,
+      "is_clean": false,
+      "hit_categories": [
+        "security"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/weather.py",
+          "line": 4,
+          "severity": "security",
+          "message": "Storing API keys directly in the source code can lead to security vulnerabilities. Consider using environment variables or a configuration file to manage sensitive information.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "sec_shell_injection",
+      "run": 1,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 323,
+      "completion_tokens": 101,
+      "seconds": 1.7073489159811288,
+      "is_clean": false,
+      "hit_categories": [
+        "security"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/tools.py",
+          "line": 6,
+          "severity": "security",
+          "message": "Using 'shell=True' with subprocess can lead to shell injection vulnerabilities. Use a list for the command instead: subprocess.run(['ping', '-c', '1', host], capture_output=True).",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "perf_n_plus_one",
+      "run": 1,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 357,
+      "completion_tokens": 104,
+      "seconds": 1.8389272911008447,
+      "is_clean": false,
+      "hit_categories": [
+        "performance"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/reports.py",
+          "line": 4,
+          "severity": "performance",
+          "message": "The new implementation retrieves each customer individually in a loop, which can lead to N+1 query performance issues. Consider fetching all customers in a single query as in the original implementation.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "perf_list_membership",
+      "run": 1,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 355,
+      "completion_tokens": 97,
+      "seconds": 3.989078750135377,
+      "is_clean": false,
+      "hit_categories": [
+        "performance"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/dedupe.py",
+          "line": 7,
+          "severity": "performance",
+          "message": "Using a list for 'seen' results in O(n^2) time complexity for checking duplicates. Consider using a set for 'seen' to improve performance to O(n).",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "clean_rename",
+      "run": 1,
+      "expected_total": 0,
+      "expected_hit": 0,
+      "comments_total": 0,
+      "comments_correct": 0,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 1,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 304,
+      "completion_tokens": 105,
+      "seconds": 2.0838719171006233,
+      "is_clean": true,
+      "hit_categories": [],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/stats.py",
+          "line": 3,
+          "severity": "bug",
+          "message": "Returning 0.0 for an empty list may not be the desired behavior for a mean function. Consider raising a ValueError to indicate that the mean cannot be calculated for an empty input.",
+          "kind": "note"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "clean_docstring",
+      "run": 1,
+      "expected_total": 0,
+      "expected_hit": 0,
+      "comments_total": 0,
+      "comments_correct": 0,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 339,
+      "completion_tokens": 24,
+      "seconds": 1.1209865838754922,
+      "is_clean": true,
+      "hit_categories": [],
+      "missed_categories": [],
+      "comments": [],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "clean_add_test",
+      "run": 1,
+      "expected_total": 0,
+      "expected_hit": 0,
+      "comments_total": 0,
+      "comments_correct": 0,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 490,
+      "completion_tokens": 24,
+      "seconds": 1.3480992089025676,
+      "is_clean": true,
+      "hit_categories": [],
+      "missed_categories": [],
+      "comments": [],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "hard_cross_file",
+      "run": 1,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 421,
+      "completion_tokens": 104,
+      "seconds": 1.9485059168655425,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/api.py",
+          "line": 5,
+          "severity": "bug",
+          "message": "The signup function hardcodes the role as 'member'. This may not be appropriate for all use cases. Consider passing the role as a parameter to the signup function to allow for flexibility.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "hard_late_hunk",
+      "run": 1,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 12898,
+      "completion_tokens": 155,
+      "seconds": 5.766496500000358,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/metrics.py",
+          "line": 1404,
+          "severity": "bug",
+          "message": "The last_value function incorrectly uses the length of the list as an index, which will result in an IndexError. Change 'return values[index]' to 'return values[-1]' to correctly return the last element.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "ctx_units_stale_caller",
+      "run": 1,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 578,
+      "completion_tokens": 116,
+      "seconds": 1.9841281669214368,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/pricing.py",
+          "line": 5,
+          "severity": "bug",
+          "message": "The change in apply_discount to accept a fraction instead of a percentage will break existing calls to this function that pass a percentage. Update the calls in app/checkout.py to pass the discount as a fraction instead of a percentage.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "ctx_rename_stale_import",
+      "run": 1,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 500,
+      "completion_tokens": 115,
+      "seconds": 2.3457710419315845,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/formatting.py",
+          "line": 4,
+          "severity": "bug",
+          "message": "The function name 'format_day' has changed from 'format_date', which will break existing calls to 'format_date' in other files. Update the references in 'app/report.py' to use 'format_day' instead.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "ctx_shared_cache_mutation",
+      "run": 1,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 566,
+      "completion_tokens": 107,
+      "seconds": 1.8442137918900698,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/catalog.py",
+          "line": 10,
+          "severity": "bug",
+          "message": "The sorting operation modifies the original list returned by load_items. If the original list is needed elsewhere, consider returning a sorted copy instead: return sorted(items, key=lambda item: item['price']).",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "ctx_rename_all_updated",
+      "run": 1,
+      "expected_total": 0,
+      "expected_hit": 0,
+      "comments_total": 0,
+      "comments_correct": 0,
+      "dropped_comments": 1,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 553,
+      "completion_tokens": 102,
+      "seconds": 1.8371676250826567,
+      "is_clean": true,
+      "hit_categories": [],
+      "missed_categories": [],
+      "comments": [],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "ctx_key_has_default",
+      "run": 1,
+      "expected_total": 0,
+      "expected_hit": 0,
+      "comments_total": 0,
+      "comments_correct": 0,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 1,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 526,
+      "completion_tokens": 107,
+      "seconds": 2.009146833093837,
+      "is_clean": true,
+      "hit_categories": [],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/client.py",
+          "line": 6,
+          "severity": "bug",
+          "message": "If APP_TIMEOUT is not set in the environment, the timeout will default to 30 seconds. Ensure that this behavior is acceptable for all use cases, as a long timeout may lead to performance issues in some scenarios.",
+          "kind": "note"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "bug_off_by_one",
+      "run": 2,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 384,
+      "completion_tokens": 118,
+      "seconds": 2.4889002919662744,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/pagination.py",
+          "line": 12,
+          "severity": "bug",
+          "message": "The range in line 12 should include the last page. Change 'range(1, total)' to 'range(1, total + 1)' to ensure all pages are included.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "bug_mutable_default",
+      "run": 2,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 296,
+      "completion_tokens": 108,
+      "seconds": 2.561676082899794,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/cart.py",
+          "line": 1,
+          "severity": "bug",
+          "message": "Using a mutable default argument (cart=[]) can lead to shared state across function calls. Change the default to None and initialize cart inside the function: 'if cart is None: cart = []'.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "bug_swallowed_exception",
+      "run": 2,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 362,
+      "completion_tokens": 89,
+      "seconds": 1.7325966248754412,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/payments.py",
+          "line": 11,
+          "severity": "bug",
+          "message": "Catching all exceptions without handling them can hide errors. Consider logging the exception or handling specific exceptions to avoid silent failures.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "bug_unclosed_file",
+      "run": 2,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 324,
+      "completion_tokens": 107,
+      "seconds": 1.9502357500605285,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/config_loader.py",
+          "line": 7,
+          "severity": "bug",
+          "message": "The file opened with 'open(path)' is not closed, which can lead to resource leaks. Use 'with open(path) as f:' to ensure the file is properly closed after reading.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "bug_none_access",
+      "run": 2,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 334,
+      "completion_tokens": 101,
+      "seconds": 1.9482622500509024,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/users.py",
+          "line": 9,
+          "severity": "bug",
+          "message": "If user_id does not exist in USERS, user will be None and accessing user['email'] will raise a TypeError. Add a check to return None or raise a custom error if the user is not found.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "bug_is_comparison",
+      "run": 2,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 311,
+      "completion_tokens": 89,
+      "seconds": 1.8457040830980986,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/status.py",
+          "line": 6,
+          "severity": "bug",
+          "message": "Use '==' instead of 'is' for string comparison. Change 'if account.status is \"active\"' to 'if account.status == \"active\"'.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "sec_sql_injection",
+      "run": 2,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 331,
+      "completion_tokens": 115,
+      "seconds": 2.220829291967675,
+      "is_clean": false,
+      "hit_categories": [
+        "security"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/db.py",
+          "line": 10,
+          "severity": "security",
+          "message": "Using f-string for SQL query can lead to SQL injection. Use parameterized queries instead: cursor.execute('SELECT id, name, email FROM users WHERE name = ?', (name,))",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "sec_hardcoded_key",
+      "run": 2,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 383,
+      "completion_tokens": 92,
+      "seconds": 1.6857448751106858,
+      "is_clean": false,
+      "hit_categories": [
+        "security"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/weather.py",
+          "line": 4,
+          "severity": "security",
+          "message": "Storing sensitive information like API keys directly in the source code is a security risk. Consider using environment variables or a secure vault to manage sensitive credentials.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "sec_shell_injection",
+      "run": 2,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 323,
+      "completion_tokens": 106,
+      "seconds": 2.1336515829898417,
+      "is_clean": false,
+      "hit_categories": [
+        "security"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/tools.py",
+          "line": 6,
+          "severity": "security",
+          "message": "Using 'shell=True' with subprocess can lead to shell injection vulnerabilities. Instead, use a list to pass the command and its arguments: subprocess.run(['ping', '-c', '1', host], capture_output=True).",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "perf_n_plus_one",
+      "run": 2,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 357,
+      "completion_tokens": 110,
+      "seconds": 2.7638369160704315,
+      "is_clean": false,
+      "hit_categories": [
+        "performance"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/reports.py",
+          "line": 4,
+          "severity": "performance",
+          "message": "The new implementation retrieves customer information one at a time in a loop, which can lead to performance issues if there are many orders. Consider retrieving all customers in a single query as was done in the original implementation.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "perf_list_membership",
+      "run": 2,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 355,
+      "completion_tokens": 98,
+      "seconds": 2.2530763749964535,
+      "is_clean": false,
+      "hit_categories": [
+        "performance"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/dedupe.py",
+          "line": 7,
+          "severity": "performance",
+          "message": "Using a list to track seen emails results in O(n^2) time complexity for checking duplicates. Consider using a set for 'seen' to improve performance to O(n).",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "clean_rename",
+      "run": 2,
+      "expected_total": 0,
+      "expected_hit": 0,
+      "comments_total": 0,
+      "comments_correct": 0,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 1,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 304,
+      "completion_tokens": 113,
+      "seconds": 2.352105916943401,
+      "is_clean": true,
+      "hit_categories": [],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/stats.py",
+          "line": 3,
+          "severity": "bug",
+          "message": "Returning 0.0 for an empty list may not be the expected behavior for a mean function. Consider raising a ValueError to indicate that the mean cannot be computed for an empty input.",
+          "kind": "note"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "clean_docstring",
+      "run": 2,
+      "expected_total": 0,
+      "expected_hit": 0,
+      "comments_total": 0,
+      "comments_correct": 0,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 339,
+      "completion_tokens": 28,
+      "seconds": 0.9526009170804173,
+      "is_clean": true,
+      "hit_categories": [],
+      "missed_categories": [],
+      "comments": [],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "clean_add_test",
+      "run": 2,
+      "expected_total": 0,
+      "expected_hit": 0,
+      "comments_total": 0,
+      "comments_correct": 0,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 490,
+      "completion_tokens": 24,
+      "seconds": 0.8942652919795364,
+      "is_clean": true,
+      "hit_categories": [],
+      "missed_categories": [],
+      "comments": [],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "hard_cross_file",
+      "run": 2,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 421,
+      "completion_tokens": 108,
+      "seconds": 2.0472642919048667,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/api.py",
+          "line": 5,
+          "severity": "bug",
+          "message": "The role 'member' is hardcoded in the signup function. This could lead to issues if the role needs to be dynamic or configurable. Consider passing the role as an argument to the signup function.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "hard_late_hunk",
+      "run": 2,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 12898,
+      "completion_tokens": 140,
+      "seconds": 3.2727306250017136,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/metrics.py",
+          "line": 1404,
+          "severity": "bug",
+          "message": "The calculation of the index is incorrect. It should be 'index = len(values) - 1' to get the last valid index of the list.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "ctx_units_stale_caller",
+      "run": 2,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 578,
+      "completion_tokens": 123,
+      "seconds": 2.1014646249823272,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/pricing.py",
+          "line": 3,
+          "severity": "bug",
+          "message": "The function now expects a discount as a fraction (0 to 1), but the existing usage in `app/checkout.py` passes a percentage (e.g., 10). Update the callers to pass the discount as a fraction instead.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "ctx_rename_stale_import",
+      "run": 2,
+      "expected_total": 1,
+      "expected_hit": 0,
+      "comments_total": 0,
+      "comments_correct": 0,
+      "dropped_comments": 2,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 500,
+      "completion_tokens": 151,
+      "seconds": 2.169190416112542,
+      "is_clean": false,
+      "hit_categories": [],
+      "missed_categories": [
+        "bug"
+      ],
+      "comments": [],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "ctx_shared_cache_mutation",
+      "run": 2,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 566,
+      "completion_tokens": 107,
+      "seconds": 1.8735929161775857,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/catalog.py",
+          "line": 10,
+          "severity": "bug",
+          "message": "The sorting operation modifies the original list returned by load_items. If the original list is needed elsewhere, consider returning a sorted copy instead: return sorted(items, key=lambda item: item['price']).",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "ctx_rename_all_updated",
+      "run": 2,
+      "expected_total": 0,
+      "expected_hit": 0,
+      "comments_total": 0,
+      "comments_correct": 0,
+      "dropped_comments": 1,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 553,
+      "completion_tokens": 130,
+      "seconds": 2.2571835829876363,
+      "is_clean": true,
+      "hit_categories": [],
+      "missed_categories": [],
+      "comments": [],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "ctx_key_has_default",
+      "run": 2,
+      "expected_total": 0,
+      "expected_hit": 0,
+      "comments_total": 0,
+      "comments_correct": 0,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 1,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 526,
+      "completion_tokens": 105,
+      "seconds": 2.262989457929507,
+      "is_clean": true,
+      "hit_categories": [],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/client.py",
+          "line": 6,
+          "severity": "bug",
+          "message": "If the 'timeout' key is not present in the configuration, this will raise a KeyError. Ensure that 'timeout' is always set in the configuration or handle the case where it might be missing.",
+          "kind": "note"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "bug_off_by_one",
+      "run": 3,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 384,
+      "completion_tokens": 103,
+      "seconds": 1.8283995410893112,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/pagination.py",
+          "line": 12,
+          "severity": "bug",
+          "message": "The range in line 12 should include 'total' to ensure the last page is processed. Change 'range(1, total)' to 'range(1, total + 1)'.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "bug_mutable_default",
+      "run": 3,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 296,
+      "completion_tokens": 117,
+      "seconds": 2.050010916078463,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/cart.py",
+          "line": 1,
+          "severity": "bug",
+          "message": "Using a mutable default argument (cart=[]) can lead to shared state across function calls. Change the default to None and initialize the cart inside the function: 'def add_item(item, cart=None): if cart is None: cart = []'.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "bug_swallowed_exception",
+      "run": 3,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 362,
+      "completion_tokens": 89,
+      "seconds": 1.8418047078885138,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/payments.py",
+          "line": 11,
+          "severity": "bug",
+          "message": "Catching all exceptions without handling them can hide errors. Consider logging the exception or handling specific exceptions to avoid silent failures.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "bug_unclosed_file",
+      "run": 3,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 324,
+      "completion_tokens": 101,
+      "seconds": 1.7426714170724154,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/config_loader.py",
+          "line": 7,
+          "severity": "bug",
+          "message": "The file is opened but not closed, which can lead to resource leaks. Use a context manager (with statement) to ensure the file is properly closed after reading.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "bug_none_access",
+      "run": 3,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 334,
+      "completion_tokens": 90,
+      "seconds": 3.7902270830236375,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/users.py",
+          "line": 9,
+          "severity": "bug",
+          "message": "This code will raise a KeyError if user_id does not exist in USERS. You should check if user is None before accessing user['email'].",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "bug_is_comparison",
+      "run": 3,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 311,
+      "completion_tokens": 91,
+      "seconds": 1.8398015829734504,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/status.py",
+          "line": 6,
+          "severity": "bug",
+          "message": "Use '==' instead of 'is' for string comparison. Change 'if account.status is \"active\"' to 'if account.status == \"active\"'.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "sec_sql_injection",
+      "run": 3,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 331,
+      "completion_tokens": 102,
+      "seconds": 1.7420589998364449,
+      "is_clean": false,
+      "hit_categories": [
+        "security"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/db.py",
+          "line": 10,
+          "severity": "security",
+          "message": "The SQL query is vulnerable to SQL injection. Use parameterized queries instead: cursor.execute('SELECT id, name, email FROM users WHERE name = ?', (name,))",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "sec_hardcoded_key",
+      "run": 3,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 383,
+      "completion_tokens": 88,
+      "seconds": 1.5350325000472367,
+      "is_clean": false,
+      "hit_categories": [
+        "security"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/weather.py",
+          "line": 4,
+          "severity": "security",
+          "message": "Storing API keys directly in the source code is a security risk. Use environment variables or a secure vault to manage sensitive information.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "sec_shell_injection",
+      "run": 3,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 323,
+      "completion_tokens": 109,
+      "seconds": 2.356425041798502,
+      "is_clean": false,
+      "hit_categories": [
+        "security"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/tools.py",
+          "line": 6,
+          "severity": "security",
+          "message": "Using 'shell=True' with subprocess can lead to shell injection vulnerabilities. Instead, use a list to pass the command and its arguments, e.g., subprocess.run(['ping', '-c', '1', host], capture_output=True).",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "perf_n_plus_one",
+      "run": 3,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 357,
+      "completion_tokens": 105,
+      "seconds": 2.00348720792681,
+      "is_clean": false,
+      "hit_categories": [
+        "performance"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/reports.py",
+          "line": 4,
+          "severity": "performance",
+          "message": "The change retrieves customer data one at a time using db.get_customer, which can lead to N+1 query problems. Consider retrieving all customers in a single query as was done previously to improve performance.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "perf_list_membership",
+      "run": 3,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 355,
+      "completion_tokens": 111,
+      "seconds": 1.8665782080497593,
+      "is_clean": false,
+      "hit_categories": [
+        "performance"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/dedupe.py",
+          "line": 7,
+          "severity": "performance",
+          "message": "Using a list to track seen emails results in O(n^2) time complexity due to the 'if e not in seen' check. Consider using a set for 'seen' to improve performance to O(n).",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "clean_rename",
+      "run": 3,
+      "expected_total": 0,
+      "expected_hit": 0,
+      "comments_total": 0,
+      "comments_correct": 0,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 1,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 304,
+      "completion_tokens": 108,
+      "seconds": 1.8563351249322295,
+      "is_clean": true,
+      "hit_categories": [],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/stats.py",
+          "line": 3,
+          "severity": "bug",
+          "message": "Returning 0.0 for an empty list may lead to misleading results. Consider raising a ValueError to indicate that the mean cannot be computed for an empty input.",
+          "kind": "note"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "clean_docstring",
+      "run": 3,
+      "expected_total": 0,
+      "expected_hit": 0,
+      "comments_total": 0,
+      "comments_correct": 0,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 339,
+      "completion_tokens": 25,
+      "seconds": 1.0316490000113845,
+      "is_clean": true,
+      "hit_categories": [],
+      "missed_categories": [],
+      "comments": [],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "clean_add_test",
+      "run": 3,
+      "expected_total": 0,
+      "expected_hit": 0,
+      "comments_total": 0,
+      "comments_correct": 0,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 490,
+      "completion_tokens": 24,
+      "seconds": 0.9182617908809334,
+      "is_clean": true,
+      "hit_categories": [],
+      "missed_categories": [],
+      "comments": [],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "hard_cross_file",
+      "run": 3,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 421,
+      "completion_tokens": 101,
+      "seconds": 1.9460033331997693,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/api.py",
+          "line": 5,
+          "severity": "bug",
+          "message": "The 'role' parameter is hardcoded as 'member'. This may not be appropriate for all use cases. Consider passing the role as an argument to the signup function.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "hard_late_hunk",
+      "run": 3,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 12898,
+      "completion_tokens": 141,
+      "seconds": 6.964638249948621,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/metrics.py",
+          "line": 1403,
+          "severity": "bug",
+          "message": "The calculation of 'index' is incorrect. It should be 'index = len(values) - 1' to get the last valid index of the list.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "ctx_units_stale_caller",
+      "run": 3,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 578,
+      "completion_tokens": 132,
+      "seconds": 2.462794541846961,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/pricing.py",
+          "line": 3,
+          "severity": "bug",
+          "message": "The change in discount input from percentage to fraction will break existing calls to `apply_discount` that pass a percentage value. Update all calls to this function, such as in `app/checkout.py`, to pass the discount as a fraction instead.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "ctx_rename_stale_import",
+      "run": 3,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 500,
+      "completion_tokens": 126,
+      "seconds": 2.34416945790872,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/formatting.py",
+          "line": 4,
+          "severity": "bug",
+          "message": "The function name was changed from 'format_date' to 'format_day', which will break any calls to 'format_date' in other files. Update the references in 'app/report.py' to use 'format_day' instead.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "ctx_shared_cache_mutation",
+      "run": 3,
+      "expected_total": 1,
+      "expected_hit": 1,
+      "comments_total": 1,
+      "comments_correct": 1,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 1,
+      "prompt_tokens": 566,
+      "completion_tokens": 109,
+      "seconds": 2.2176099170465022,
+      "is_clean": false,
+      "hit_categories": [
+        "bug"
+      ],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/catalog.py",
+          "line": 10,
+          "severity": "bug",
+          "message": "The sort method modifies the original list in place. If the original list is needed later, consider using sorted(items, key=lambda item: item['price']) to return a new sorted list instead.",
+          "kind": "inline"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "ctx_rename_all_updated",
+      "run": 3,
+      "expected_total": 0,
+      "expected_hit": 0,
+      "comments_total": 0,
+      "comments_correct": 0,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 0,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 553,
+      "completion_tokens": 41,
+      "seconds": 1.3714373330585659,
+      "is_clean": true,
+      "hit_categories": [],
+      "missed_categories": [],
+      "comments": [],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    },
+    {
+      "case_id": "ctx_key_has_default",
+      "run": 3,
+      "expected_total": 0,
+      "expected_hit": 0,
+      "comments_total": 0,
+      "comments_correct": 0,
+      "dropped_comments": 0,
+      "failed_chunks": 0,
+      "skipped_files": 0,
+      "notes_total": 1,
+      "expected_hit_with_notes": 0,
+      "prompt_tokens": 526,
+      "completion_tokens": 115,
+      "seconds": 2.457848499994725,
+      "is_clean": true,
+      "hit_categories": [],
+      "missed_categories": [],
+      "comments": [
+        {
+          "path": "app/client.py",
+          "line": 6,
+          "severity": "bug",
+          "message": "If the 'timeout' key is not set in the environment variable APP_TIMEOUT, it will default to None, which may cause httpx.get to hang indefinitely. Ensure that a valid timeout value is always provided, or handle the case where it might be None.",
+          "kind": "note"
+        }
+      ],
+      "mode": "pipeline",
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_fallback": null,
+      "agent_trace": [],
+      "agent_filtered": 0
+    }
+  ]
+}

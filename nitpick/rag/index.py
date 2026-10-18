@@ -43,6 +43,9 @@ def list_source_files(repo_dir: str | Path, extensions: set[str] = DEFAULT_EXTEN
         paths = [p for p in out.splitlines() if p]
     except (subprocess.CalledProcessError, FileNotFoundError):
         paths = []
+    if not paths:
+        # Not a git repo, or a directory whose files are untracked
+        # (e.g. a new evaluation fixture): walk the file system instead.
         for root, dirs, files in os.walk(repo_dir):
             dirs[:] = [d for d in dirs if d not in IGNORED_DIRS]
             for f in files:

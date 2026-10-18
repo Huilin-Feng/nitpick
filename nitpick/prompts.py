@@ -25,8 +25,12 @@ Respond with JSON only, in exactly this shape:
 }"""
 
 
-def build_user_prompt(diff_chunk: str) -> str:
-    return f"Review the following diff.\n\n{diff_chunk}"
+def build_user_prompt(diff_chunk: str, related_code: str = "") -> str:
+    """`related_code` is the RAG section (see nitpick.rag); empty in pipeline mode."""
+    prompt = f"Review the following diff.\n\n{diff_chunk}"
+    if related_code:
+        prompt += f"\n\n{related_code}"
+    return prompt
 
 
 AGENT_SYSTEM_PROMPT = """You are a careful senior software engineer reviewing a pull request.

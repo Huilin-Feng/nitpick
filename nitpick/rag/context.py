@@ -16,7 +16,9 @@ SECTION_INTRO = (
     "or look similar to the changed code. Use them only to check cross-file consistency: "
     "callers that need updating, interfaces or signatures that no longer match, shared "
     "constants, duplicated logic. Do NOT leave review comments on these snippets themselves; "
-    "if one reveals a problem, comment on the changed line in the PR that causes it."
+    "if one reveals a problem, comment on the changed line in the PR that causes it and "
+    "name the affected file and line in the message. Only report a cross-file problem "
+    "when a snippet shows the concrete code that breaks."
 )
 
 
