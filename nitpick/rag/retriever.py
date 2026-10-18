@@ -2,7 +2,9 @@
 
 Why two paths: most cross-file bugs are "function A changed, caller B didn't".
 B's code usually doesn't *look* like A's diff, so pure embedding search tends to
-miss it. Searching for chunks that mention the changed symbol finds B directly.
+miss it. Symbol matching looks in two directions:
+  * callers: chunks that mention a function the PR changed ("symbol:<name>")
+  * definitions: the code of functions the new lines call ("defines:<name>")
 Semantic search covers what symbol matching can't (similar logic, shared
 constants, parallel implementations).
 """
@@ -10,7 +12,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from .diff_utils import changed_paths, extract_changed_symbols, parse_unified_diff
+from .diff_utils import changed_paths, extract_changed_symbols, extract_used_names, parse_unified_diff
 from .embedder import Embedder
 from .models import RetrievalResult, RetrievedChunk, approx_tokens
 from .store import VectorStore
@@ -23,6 +25,7 @@ class RetrievalConfig:
     k_semantic: int = 5          # top-k per hunk
     max_symbol_hits: int = 6     # per symbol
     max_symbols: int = 10        # cap symbols searched per PR
+    max_used_names: int = 10     # cap called/imported names whose definitions are fetched
     min_semantic_score: float = 0.25
     token_budget: int = 3000     # max tokens of retrieved code added to the prompt
     max_hunks: int = 20          # cap embedding calls on huge PRs
@@ -46,6 +49,9 @@ class Retriever:
             for sym in extract_changed_symbols(files)[:cfg.max_symbols]:
                 for chunk in self.store.search_text(sym, exclude, cfg.max_symbol_hits):
                     candidates.setdefault(chunk.id, RetrievedChunk(chunk, 1.0, f"symbol:{sym}"))
+            for name in extract_used_names(files)[:cfg.max_used_names]:
+                for chunk in self.store.find_symbol(name, exclude, limit=2):
+                    candidates.setdefault(chunk.id, RetrievedChunk(chunk, 0.9, f"defines:{name}"))
 
         # 2) semantic matches per hunk
         semantic: dict[str, RetrievedChunk] = {}

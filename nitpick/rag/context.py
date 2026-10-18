@@ -12,8 +12,8 @@ _LANG = {".py": "python", ".js": "javascript", ".jsx": "jsx", ".ts": "typescript
 
 SECTION_INTRO = (
     "## Related code from the repository (not part of this PR)\n"
-    "These snippets were retrieved because they reference symbols changed in this PR "
-    "or look similar to the changed code. Use them only to check cross-file consistency: "
+    "These snippets were retrieved because they reference functions changed in this PR, "
+    "define functions the new code calls, or look similar to the changed code. Use them only to check cross-file consistency: "
     "callers that need updating, interfaces or signatures that no longer match, shared "
     "constants, duplicated logic. Do NOT leave review comments on these snippets themselves; "
     "if one reveals a problem, comment on the changed line in the PR that causes it and "
@@ -34,6 +34,8 @@ def format_related_code(result: RetrievalResult) -> str:
             label += f" ({c.symbol})"
         if item.reason.startswith("symbol:"):
             label += f" — references `{item.reason.split(':', 1)[1]}`"
+        elif item.reason.startswith("defines:"):
+            label += f" — definition of `{item.reason.split(':', 1)[1]}`, called by the new code"
         else:
             label += f" — similar code (score {item.score:.2f})"
         lang = _LANG.get(Path(c.path).suffix.lower(), "")

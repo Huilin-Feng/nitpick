@@ -26,6 +26,9 @@ class Hunk:
     header_context: str            # text after the second @@, often the enclosing def
     added: list[str] = field(default_factory=list)
     removed: list[str] = field(default_factory=list)
+    # every line in order as (kind, text), kind in "+", "-", " "; keeps the
+    # unchanged context so we can tell which function a change sits in
+    lines: list[tuple[str, str]] = field(default_factory=list)
 
     def query_text(self) -> str:
         """Text used as the semantic search query for this hunk."""
@@ -74,13 +77,16 @@ def parse_unified_diff(diff_text: str) -> list[FileDiff]:
         if hunk is not None and (old_left > 0 or new_left > 0):
             if line.startswith("+"):
                 hunk.added.append(line[1:])
+                hunk.lines.append(("+", line[1:]))
                 new_left -= 1
             elif line.startswith("-"):
                 hunk.removed.append(line[1:])
+                hunk.lines.append(("-", line[1:]))
                 old_left -= 1
             elif line.startswith("\\"):
                 pass  # "\ No newline at end of file"
             else:  # context line (" x" or an empty line whose space was stripped)
+                hunk.lines.append((" ", line[1:]))
                 old_left -= 1
                 new_left -= 1
             i += 1
@@ -123,17 +129,79 @@ def _symbol_from_line(line: str) -> str | None:
     return None
 
 
+def _indent(line: str) -> int:
+    return len(line) - len(line.lstrip())
+
+
+def _usable(name: str | None) -> bool:
+    return bool(name) and len(name) >= MIN_SYMBOL_LEN and name not in STOP_SYMBOLS
+
+
 def extract_changed_symbols(files: list[FileDiff]) -> list[str]:
-    """Functions/classes defined in changed lines, plus the enclosing def from hunk headers.
+    """Functions/classes the PR changes. Their callers elsewhere may need updating.
+
+    Three sources:
+      * def/class lines that were added or removed (signature changes, renames)
+      * the enclosing def from the @@ header (git adds it when the def is above the hunk)
+      * the enclosing def found in the hunk's own context lines, for a body-only
+        change whose def line is shown unchanged (the header is then empty,
+        e.g. for a short file where the hunk starts at line 1)
 
     Order is stable (first seen first) so retrieval is deterministic.
     """
     seen: dict[str, None] = {}
+
+    def add(name: str | None) -> None:
+        if _usable(name):
+            seen.setdefault(name, None)
+
     for f in files:
         for h in f.hunks:
-            candidates = [_symbol_from_line(h.header_context)] if h.header_context else []
-            candidates += [_symbol_from_line(l) for l in h.removed + h.added]
-            for name in candidates:
-                if name and len(name) >= MIN_SYMBOL_LEN and name not in STOP_SYMBOLS:
-                    seen.setdefault(name, None)
+            if h.header_context:
+                add(_symbol_from_line(h.header_context))
+            enclosing: tuple[str, int] | None = None  # (name, indent) of the last def seen
+            for kind, text in h.lines:
+                name = _symbol_from_line(text)
+                if name:
+                    if kind != " ":
+                        add(name)
+                    enclosing = (name, _indent(text))
+                    continue
+                if kind != " " and text.strip() and enclosing and _indent(text) > enclosing[1]:
+                    add(enclosing[0])
+    return list(seen)
+
+
+# A bare call `name(` (not `obj.name(`), and names pulled in by `from x import a, b`
+_CALL_RE = re.compile(r"(?<![\w.])([A-Za-z_][A-Za-z0-9_]*)\s*\(")
+_FROM_IMPORT_RE = re.compile(r"^\s*from\s+[\w.]+\s+import\s+\(?([\w\s,]+)\)?")
+_NOT_CALLEES = {
+    # Python keywords and builtins that look like calls
+    "if", "elif", "while", "for", "return", "yield", "assert", "print", "len", "range", "str",
+    "int", "float", "bool", "dict", "list", "set", "tuple", "sorted", "reversed", "isinstance",
+    "issubclass", "super", "open", "enumerate", "zip", "map", "filter", "sum", "min", "max",
+    "abs", "round", "repr", "type", "getattr", "setattr", "hasattr", "iter", "next", "any", "all",
+    "Exception", "ValueError", "TypeError", "KeyError", "RuntimeError", "NotImplementedError",
+}
+
+
+def extract_used_names(files: list[FileDiff]) -> list[str]:
+    """Functions the added code calls or imports. Their definitions may matter.
+
+    Example: a new helper sorts the list returned by `load_items()`; whether
+    that is a bug depends on how `load_items` is written, which is outside the diff.
+    Names defined in the diff itself are skipped (their code is already visible).
+    """
+    defined = {_symbol_from_line(l) for f in files for h in f.hunks for _, l in h.lines}
+    seen: dict[str, None] = {}
+    for f in files:
+        for h in f.hunks:
+            for line in h.added:
+                names = _CALL_RE.findall(line)
+                m = _FROM_IMPORT_RE.match(line)
+                if m:
+                    names += [n.strip().split(" as ")[0] for n in m.group(1).split(",")]
+                for name in names:
+                    if name not in _NOT_CALLEES and name not in defined and _usable(name):
+                        seen.setdefault(name, None)
     return list(seen)

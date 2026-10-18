@@ -18,6 +18,8 @@ class VectorStore(Protocol):
               exclude_paths: Iterable[str] = ()) -> list[tuple[Chunk, float]]: ...
     def search_text(self, term: str, exclude_paths: Iterable[str] = (),
                     limit: int = 20) -> list[Chunk]: ...
+    def find_symbol(self, name: str, exclude_paths: Iterable[str] = (),
+                    limit: int = 5) -> list[Chunk]: ...
     def count(self) -> int: ...
 
 
@@ -52,6 +54,10 @@ class InMemoryStore:
         hits = [c for c, _ in self._items if c.path not in excluded and _mentions(c.text, term)]
         return hits[:limit]
 
+    def find_symbol(self, name, exclude_paths=(), limit=5):
+        excluded = set(exclude_paths)
+        return [c for c, _ in self._items if c.path not in excluded and c.symbol == name][:limit]
+
     def count(self) -> int:
         return len(self._items)
 
@@ -80,9 +86,14 @@ class ChromaStore:
                      meta.get("symbol") or None, doc)
 
     @staticmethod
-    def _where(exclude_paths: Iterable[str]) -> dict | None:
+    def _where(exclude_paths: Iterable[str], **equals) -> dict | None:
+        conditions = [{k: v} for k, v in equals.items()]
         excluded = sorted(set(exclude_paths))
-        return {"path": {"$nin": excluded}} if excluded else None
+        if excluded:
+            conditions.append({"path": {"$nin": excluded}})
+        if not conditions:
+            return None
+        return conditions[0] if len(conditions) == 1 else {"$and": conditions}
 
     def add(self, chunks, embeddings, batch_size: int = 500) -> None:
         for i in range(0, len(chunks), batch_size):
@@ -115,6 +126,11 @@ class ChromaStore:
         chunks = [self._from_row(d, m) for d, m in zip(res["documents"], res["metadatas"])]
         # $contains is a substring match; keep only whole-word mentions
         return [c for c in chunks if _mentions(c.text, term)][:limit]
+
+    def find_symbol(self, name, exclude_paths=(), limit=5):
+        res = self.collection.get(where=self._where(exclude_paths, symbol=name),
+                                  include=["documents", "metadatas"], limit=limit)
+        return [self._from_row(d, m) for d, m in zip(res["documents"], res["metadatas"])]
 
     def count(self) -> int:
         return self.collection.count()

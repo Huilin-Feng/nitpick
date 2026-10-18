@@ -64,3 +64,17 @@ def test_builder_end_to_end(sample_repo, pr_diff):
     assert "## Related code from the repository" in text
     assert "checkout.py" in text and "references `calculate_total`" in text
     assert rag.last_result is not None and rag.index_stats.chunks > 0
+
+
+def test_fetches_definition_of_function_the_new_code_calls():
+    store, emb = InMemoryStore(), HashEmbedder()
+    loader = Chunk("app/storage.py", 1, 6, "load_items",
+                   "_CACHE = []\n\ndef load_items():\n    return _CACHE")
+    other = Chunk("app/ui.py", 1, 2, "render", "def render():\n    return ''")
+    store.add([loader, other], emb.embed([loader.text, other.text]))
+    diff = (
+        "--- a/app/catalog.py\n+++ b/app/catalog.py\n@@ -1,0 +1,3 @@\n"
+        "+def cheapest_first():\n+    items = load_items()\n+    items.sort()\n"
+    )
+    result = Retriever(store, emb, RetrievalConfig(use_semantic=False)).retrieve(diff)
+    assert [(r.chunk.path, r.reason) for r in result.chunks] == [("app/storage.py", "defines:load_items")]

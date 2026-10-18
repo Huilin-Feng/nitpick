@@ -21,6 +21,8 @@ def _run_store_contract(store):
     assert [c.path for c, _ in store.query([1, 0], k=2, exclude_paths=["a.py"])] == ["b.py", "c.py"]
     assert [c.path for c in store.search_text("g")] == ["a.py", "b.py"]
     assert [c.path for c in store.search_text("g", exclude_paths=["a.py"])] == ["b.py"]
+    assert [c.path for c in store.find_symbol("g")] == ["b.py"]
+    assert store.find_symbol("g", exclude_paths=["b.py"]) == []
 
 
 def test_in_memory_store():

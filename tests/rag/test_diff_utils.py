@@ -65,3 +65,44 @@ def test_no_newline_marker_and_multiple_files():
     assert [f.path for f in files] == ["a.py", "b.py"]
     assert files[0].hunks[0].removed == ["x = 1"] and files[0].hunks[0].added == ["x = 2"]
     assert files[1].hunks[0].added == ["y = 2"]
+
+
+def test_body_only_change_finds_enclosing_def_in_context_lines():
+    # Short file: the hunk starts at line 1, so git puts no def in the @@ header.
+    diff = (
+        "--- a/app/pricing.py\n+++ b/app/pricing.py\n@@ -1,3 +1,5 @@\n"
+        " def apply_discount(price, discount):\n"
+        "-    return price * (1 - discount / 100)\n"
+        "+    if not 0 <= discount <= 1:\n"
+        "+        raise ValueError(\"discount must be a fraction\")\n"
+        "+    return price * (1 - discount)\n"
+    )
+    assert extract_changed_symbols(parse_unified_diff(diff)) == ["apply_discount"]
+
+
+def test_top_level_change_after_a_function_is_not_attributed_to_it():
+    diff = (
+        "--- a/m.py\n+++ b/m.py\n@@ -1,3 +1,3 @@\n"
+        " def helper_func():\n"
+        "     return 1\n"
+        "-LIMIT = 5\n"
+        "+LIMIT = 6\n"
+    )
+    assert extract_changed_symbols(parse_unified_diff(diff)) == []
+
+
+def test_used_names_calls_and_imports():
+    from nitpick.rag.diff_utils import extract_used_names
+    diff = (
+        "--- a/app/catalog.py\n+++ b/app/catalog.py\n@@ -1,1 +1,6 @@\n"
+        "-pass\n"
+        "+from app.storage import load_items, save_items as save\n"
+        "+def sorted_items():\n"
+        "+    items = load_items()\n"
+        "+    print(len(items))\n"
+        "+    self.refresh_cache()\n"
+        "+    return sorted_items_helper(items)\n"
+    )
+    names = extract_used_names(parse_unified_diff(diff))
+    # builtins, method calls and names defined in the diff are left out
+    assert names == ["load_items", "save_items", "sorted_items_helper"]

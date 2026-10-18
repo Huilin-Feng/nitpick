@@ -10,10 +10,12 @@ def test_format_labels_and_language():
     res = RetrievalResult(chunks=[
         RetrievedChunk(Chunk("svc/a.py", 3, 9, "Svc.load", "def load(): ..."), 1.0, "symbol:load_user"),
         RetrievedChunk(Chunk("web/b.ts", 1, 4, None, "const x = 1"), 0.734, "semantic"),
+        RetrievedChunk(Chunk("app/s.py", 1, 2, "load_items", "def load_items(): ..."), 0.9, "defines:load_items"),
     ])
     out = format_related_code(res)
     assert "### svc/a.py:L3-L9 (Svc.load) — references `load_user`" in out
     assert "```python\ndef load(): ...\n```" in out
     assert "### web/b.ts:L1-L4 — similar code (score 0.73)" in out
     assert "```typescript" in out
+    assert "(load_items) — definition of `load_items`, called by the new code" in out
     assert "Do NOT leave review comments on these snippets" in out
