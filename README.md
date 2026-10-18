@@ -39,6 +39,8 @@ flowchart LR
 | `diff_parser.py` | Parse unified diff into files, hunks and line numbers |
 | `chunker.py` | Filter, prioritise and split files into LLM-sized chunks |
 | `reviewer.py` | Call the LLM per chunk, validate and rank comments |
+| `agent.py`, `repo_snapshot.py` | Agent mode: let the model read and search the repository with tools |
+| `rag/` | RAG mode: index repository code in Chroma, retrieve related code, re-anchor comments |
 | `jobs.py` | Fetch the PR, run the review, post it (with fallback) |
 | `store.py` | SQLite record of reviewed commits (deduplication, incremental reviews) |
 | `main.py` | Webhook endpoint: signature check, event filtering |
@@ -86,6 +88,27 @@ flowchart LR
 
 ## Results
 
+### Review modes compared
+
+Measured on the same day with the same code: 21 cases (11 single-file
+bugs, 4 cross-file bugs, 1 large-diff case, 5 clean PRs), 3 runs each,
+`gpt-4o-mini`.
+
+| Mode | Recall | Strict precision | Inline false positives per clean PR | Cost per review | Avg seconds |
+| --- | --- | --- | --- | --- | --- |
+| Pipeline (default) | 88% | 100% | 0.07 | $0.00020 | n/a |
+| RAG, symbol retrieval only | 100% | 100% | 0.13 | $0.00021 | 1.7 |
+| RAG, hybrid (symbol + embeddings) | 100% | 100% | 0.20 | $0.00021 | n/a |
+| Agent | 100% | 100% | 0.80 | $0.00123 | 4.1 |
+
+RAG matches the agent's recall with one LLM call per chunk, at about 1/6
+of the cost and with a quarter of the false positives on clean PRs. The
+clearest gain is a renamed function still imported by a file outside the
+diff: the pipeline never catches it (0/3), RAG always does (3/3). Details, ablation and
+the bug found by the first evaluation run: [docs/rag-mode.md](docs/rag-mode.md).
+
+### Pipeline iterations
+
 Measured with the [evaluation harness](evaluation/README.md): 16 small
 PRs (11 with one planted bug, security or performance issue, 3 clean
 PRs that should get no comments, and 2 harder cases), each run 3 times
@@ -125,7 +148,7 @@ How to read this honestly:
   attaches the comment to a renamed line, which the changed-lines rule
   cannot distinguish. Fixing this would need semantic checks; it was
   left as is because it happens in about one run in three.
-- **Small sample.** 16 cases and 3 runs each; differences of a few
+- **Small sample.** 16 to 21 cases and 3 runs each; differences of a few
   percent are not meaningful.
 - Tokens are estimated as characters / 4 rather than counted exactly.
 
@@ -178,17 +201,32 @@ pytest -q
 See [evaluation/README.md](evaluation/README.md) for the benchmark of
 planted bugs used to measure review quality.
 
-## Agent mode (experimental)
+## Review modes (experimental)
 
-`REVIEW_MODE=agent` lets the model read and search the repository before it
-comments. On 5 context-dependent cases it found 9/9 planted bugs versus 2/9
-for the pipeline, at about 7x the cost and with more comments on clean PRs,
-so the pipeline stays the default. Design, results, the iteration log and
-limitations: [docs/agent-mode.md](docs/agent-mode.md).
+The pipeline only sees the diff. Two experimental modes give the model the
+rest of the repository, for bugs whose cause is in the diff but whose
+symptom is in another file (a stale caller, a renamed function still
+imported elsewhere). Both are evaluation-only for now; the webhook server
+runs the pipeline.
 
-    python -m evaluation.run_eval --mode agent --label agent
-    python -m evaluation.compare <label-a> <label-b>
+- **RAG mode** retrieves related code before the single LLM call:
+  callers of the functions the PR changes, definitions of the functions
+  the new code calls, and semantically similar chunks (OpenAI embeddings
+  stored in Chroma). Comments the model places on retrieved code, outside
+  the diff, are moved to the changed line that causes them.
+  [docs/rag-mode.md](docs/rag-mode.md)
+- **Agent mode** lets the model call `read_file` and `search_code` before
+  it submits a review. It can follow call chains that RAG cannot, but it
+  costs about 6x as much and comments more on clean PRs.
+  [docs/agent-mode.md](docs/agent-mode.md)
 
+```bash
+python -m evaluation.run_eval --mode rag --label rag-hybrid
+python -m evaluation.run_eval --mode rag --rag-variant symbol --label rag-symbol
+python -m evaluation.run_eval --mode agent --label agent
+python -m evaluation.debug_case <case-id>      # prompt and raw LLM reply for one case
+python -m evaluation.compare <label-a> <label-b>
+```
 
 ## Roadmap
 
@@ -199,6 +237,9 @@ limitations: [docs/agent-mode.md](docs/agent-mode.md).
 - [x] Evaluation on real pull requests
 - [x] Per-repository configuration file
 - [x] Agent mode prototype with evaluation against the pipeline (see [docs/agent-mode.md](docs/agent-mode.md))
+- [x] RAG mode with hybrid retrieval, comment re-anchoring and an ablation study (see [docs/rag-mode.md](docs/rag-mode.md))
+- [ ] Wire RAG mode into the webhook server (index the PR's base commit, cache per commit)
 - [ ] Wire agent mode into the webhook server (download the PR's head commit as a snapshot)
 - [ ] Run the agent only on PRs that rename or change function signatures
 - [ ] Score evaluation comments by content, not only by location
+- [ ] Harder cross-file cases (multi-hop call chains) to separate RAG from the agent
