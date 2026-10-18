@@ -106,3 +106,28 @@ def test_used_names_calls_and_imports():
     names = extract_used_names(parse_unified_diff(diff))
     # builtins, method calls and names defined in the diff are left out
     assert names == ["load_items", "save_items", "sorted_items_helper"]
+
+
+def test_symbol_anchors_body_change_rename_and_call_site():
+    from nitpick.rag.diff_utils import symbol_anchors
+    diff = (
+        "--- a/app/pricing.py\n+++ b/app/pricing.py\n@@ -1,2 +1,4 @@\n"
+        " def apply_discount(price, discount):\n"
+        "-    return price * (1 - discount / 100)\n"
+        "+    if not 0 <= discount <= 1:\n"
+        "+        raise ValueError(\"fraction\")\n"
+        "+    return price * (1 - discount)\n"
+        "--- a/app/formatting.py\n+++ b/app/formatting.py\n@@ -3,2 +3,2 @@\n"
+        " import datetime\n"
+        "-def format_date(d):\n"
+        "+def format_day(d):\n"
+        "     return d.isoformat()\n"
+        "--- a/app/catalog.py\n+++ b/app/catalog.py\n@@ -8,0 +9,2 @@\n"
+        "+    items = load_items()\n"
+        "+    items.sort()\n"
+    )
+    anchors = symbol_anchors(parse_unified_diff(diff))
+    assert anchors["apply_discount"] == ("app/pricing.py", 2)   # first added line in the body
+    assert anchors["format_date"] == ("app/formatting.py", 4)   # old name -> new def line
+    assert anchors["format_day"] == ("app/formatting.py", 4)
+    assert anchors["load_items"] == ("app/catalog.py", 9)       # call site

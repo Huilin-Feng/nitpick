@@ -132,6 +132,7 @@ def summarize_rag(rag_runs: list[dict], cache: RagCache, price_embed: float) -> 
         "avg_context_tokens": sum(r["context_tokens"] for r in rag_runs) / n,
         "avg_query_embedding_cost_usd": query_tokens / 1e6 * price_embed / n,
         "dropped_for_budget": sum(r["dropped_for_budget"] for r in rag_runs),
+        "reanchored_comments": sum(r["reanchored"] for r in rag_runs),
     }
 
 
@@ -139,6 +140,7 @@ def print_rag_report(rag: dict) -> None:
     print(f"indexed chunks:         {rag['indexed_chunks']}  (one-time embedding cost ${rag['index_cost_usd']:.5f})")
     print(f"avg retrieved chunks:   {rag['avg_retrieved_chunks']:.1f}  (~{rag['avg_context_tokens']:.0f} prompt tokens)")
     print(f"avg query embed cost:   ${rag['avg_query_embedding_cost_usd']:.6f} per review (not in avg cost above)")
+    print(f"re-anchored comments:   {rag['reanchored_comments']}  (moved from retrieved code onto the diff)")
     if rag["dropped_for_budget"]:
         print(f"cut by token budget:    {rag['dropped_for_budget']} chunks in total")
 
@@ -241,7 +243,7 @@ def main(argv: list[str] | None = None) -> int:
                 result = agent.review(case.diff_text, RepoSnapshot(case.snapshot_dir))
             elif mode == "rag":
                 related = rag.build(case.diff_text)
-                result = reviewer.review(case.diff_text, related_code=related)
+                result = reviewer.review(case.diff_text, related_code=related, reanchor=rag.reanchor)
                 rr = rag.last_result
                 rag_runs.append({
                     "case_id": case.id,
@@ -250,6 +252,7 @@ def main(argv: list[str] | None = None) -> int:
                     "context_tokens": rr.context_tokens,
                     "query_embedding_tokens": rr.embedding_tokens,
                     "dropped_for_budget": rr.dropped_for_budget,
+                    "reanchored": rag.last_reanchored,
                 })
             else:
                 result = reviewer.review(case.diff_text)
@@ -290,7 +293,7 @@ def main(argv: list[str] | None = None) -> int:
             ))
             agent_info = ""
             if mode == "rag":
-                agent_info = f"  retrieved {len(rag_runs[-1]['retrieved'])}"
+                agent_info = f"  retrieved {len(rag_runs[-1]['retrieved'])}  re-anchored {rag_runs[-1]['reanchored']}"
             if mode == "agent":
                 agent_info = f"  steps {result.agent_steps}  tools {result.agent_tool_calls}"
                 if result.agent_fallback:

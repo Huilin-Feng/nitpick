@@ -5,6 +5,7 @@ test and reuse (CLI, webhook server, or an evaluation script).
 """
 
 import logging
+from collections.abc import Callable
 
 from nitpick.chunker import build_chunks
 from nitpick.diff_parser import parse_diff
@@ -29,7 +30,11 @@ class Reviewer:
         self.max_chunks = max_chunks
 
     def review(
-        self, diff_text: str, position_diff_text: str | None = None, related_code: str = ""
+        self,
+        diff_text: str,
+        position_diff_text: str | None = None,
+        related_code: str = "",
+        reanchor: Callable[[list], list] | None = None,
     ) -> ReviewResult:
         """Review `diff_text`.
 
@@ -41,6 +46,8 @@ class Reviewer:
 
         `related_code` is repository code retrieved by RAG (rag mode). It is
         appended to every chunk's prompt; pipeline mode passes "".
+        `reanchor` (rag mode) may move comments the model put on retrieved code
+        onto the changed line that causes them, before placement.
         """
         files = parse_diff(diff_text)
         chunks, skipped = build_chunks(files, self.max_tokens_per_chunk, self.max_chunks)
@@ -65,7 +72,10 @@ class Reviewer:
             if isinstance(summary, str) and summary.strip():
                 summaries.append(summary.strip())
 
-            inline, context, bad = placer.place(data.get("comments") or [])
+            raws = data.get("comments") or []
+            if reanchor is not None:
+                raws = reanchor(raws)
+            inline, context, bad = placer.place(raws)
             comments += inline
             notes += context
             dropped += bad

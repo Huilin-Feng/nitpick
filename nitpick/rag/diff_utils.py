@@ -30,6 +30,17 @@ class Hunk:
     # unchanged context so we can tell which function a change sits in
     lines: list[tuple[str, str]] = field(default_factory=list)
 
+    def numbered(self) -> list[tuple[str, str, int | None]]:
+        """(kind, text, new line number); removed lines have no new number."""
+        out, n = [], self.new_start
+        for kind, text in self.lines:
+            if kind == "-":
+                out.append((kind, text, None))
+            else:
+                out.append((kind, text, n))
+                n += 1
+        return out
+
     def query_text(self) -> str:
         """Text used as the semantic search query for this hunk."""
         parts = []
@@ -205,3 +216,60 @@ def extract_used_names(files: list[FileDiff]) -> list[str]:
                     if name not in _NOT_CALLEES and name not in defined and _usable(name):
                         seen.setdefault(name, None)
     return list(seen)
+
+
+def symbol_anchors(files: list[FileDiff]) -> dict[str, tuple[str, int]]:
+    """Map a name to the first *added* line in the diff that it belongs to.
+
+    Used to move a comment the model wrote on retrieved code (outside the diff,
+    so GitHub would reject it) onto the changed line that causes the problem:
+      * a changed function -> its first added line (new def line, or first
+        added line in its body)
+      * a renamed/removed def -> the added def line that replaces it
+      * a called/imported name -> the added line that calls or imports it
+    Only added lines are used, because only those become inline comments.
+    """
+    anchors: dict[str, tuple[str, int]] = {}
+
+    def put(name: str | None, path: str, line: int) -> None:
+        if name:
+            anchors.setdefault(name, (path, line))
+
+    for f in files:
+        if not f.new_path:
+            continue  # deleted file: nothing to anchor to
+        for h in f.hunks:
+            header_sym = _symbol_from_line(h.header_context) if h.header_context else None
+            enclosing: tuple[str, int] | None = None
+            removed_defs: list[str] = []
+            for kind, text, no in h.numbered():
+                name = _symbol_from_line(text)
+                if kind == "-":
+                    if name:
+                        removed_defs.append(name)
+                    continue
+                if name:
+                    enclosing = (name, _indent(text))
+                if kind == " ":
+                    if text.strip():
+                        removed_defs = []  # a removed def not replaced right away
+                    continue
+                if not text.strip():
+                    continue
+                # kind == "+"
+                if name:
+                    put(name, f.new_path, no)
+                    for old in removed_defs:
+                        put(old, f.new_path, no)
+                    removed_defs = []
+                elif enclosing and _indent(text) > enclosing[1]:
+                    put(enclosing[0], f.new_path, no)
+                elif enclosing is None and header_sym:
+                    put(header_sym, f.new_path, no)
+                for called in _CALL_RE.findall(text):
+                    put(called, f.new_path, no)
+                m = _FROM_IMPORT_RE.match(text)
+                if m:
+                    for imported in m.group(1).split(","):
+                        put(imported.strip().split(" as ")[0], f.new_path, no)
+    return anchors

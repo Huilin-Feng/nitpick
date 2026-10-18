@@ -18,7 +18,8 @@ SECTION_INTRO = (
     "constants, duplicated logic. Do NOT leave review comments on these snippets themselves; "
     "if one reveals a problem, comment on the changed line in the PR that causes it and "
     "name the affected file and line in the message. Only report a cross-file problem "
-    "when a snippet shows the concrete code that breaks."
+    "when a snippet shows the concrete code that breaks. The \"path\" of every comment "
+    "must be a file from the diff above (shown after 'File:'), never a path from this section."
 )
 
 

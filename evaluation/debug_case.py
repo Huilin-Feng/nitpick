@@ -38,13 +38,19 @@ def main() -> None:
 
     settings = Settings.from_env()
     case = next(c for c in load_cases(ROOT / "cases.json") if c.id == args.case_id)
-    related = ""
+    related, rag = "", None
     if not args.pipeline:
-        related = RagCache(build_embedder(settings, False), args.variant, None).get(case).build(case.diff_text)
+        rag = RagCache(build_embedder(settings, False), args.variant, None).get(case)
+        related = rag.build(case.diff_text)
 
-    result = Reviewer(SpyLLM(build_llm(settings, False))).review(case.diff_text, related_code=related)
+    result = Reviewer(SpyLLM(build_llm(settings, False))).review(
+        case.diff_text, related_code=related, reanchor=rag.reanchor if rag else None
+    )
     print("=" * 30, "AFTER PLACEMENT", "=" * 28)
-    print(f"inline {len(result.comments)}  notes {len(result.notes)}  dropped {result.dropped_comments}")
+    print(f"inline {len(result.comments)}  notes {len(result.notes)}  dropped {result.dropped_comments}"
+          f"  re-anchored {rag.last_reanchored if rag else 0}")
+    for c in result.comments + result.notes:
+        print(f"  {c.path}:{c.line}  {c.message[:120]}")
     print("expected:", json.dumps([e.__dict__ if hasattr(e, "__dict__") else e for e in case.expected],
                                  default=str, ensure_ascii=False))
 

@@ -40,3 +40,23 @@ def test_reviewer_default_has_no_related_section():
     llm = CapturingLLM()
     Reviewer(llm).review(DIFF)
     assert llm.prompts and "Related code" not in llm.prompts[0]
+
+
+class OffDiffLLM:
+    """Comments on a file that is not in the diff, like the model does with retrieved code."""
+
+    def complete_json(self, system: str, user: str) -> dict:
+        return {"summary": "", "comments": [
+            {"path": "app/caller.py", "line": 6, "severity": "bug", "message": "stale caller"}
+        ]}
+
+
+def test_reanchor_hook_turns_a_dropped_comment_into_an_inline_one():
+    def reanchor(raws):
+        return [dict(r, path="app/x.py", line=2) for r in raws]
+
+    without = Reviewer(OffDiffLLM()).review(DIFF)
+    assert without.comments == [] and without.dropped_comments == 1
+
+    with_hook = Reviewer(OffDiffLLM()).review(DIFF, reanchor=reanchor)
+    assert [(c.path, c.line) for c in with_hook.comments] == [("app/x.py", 2)]
